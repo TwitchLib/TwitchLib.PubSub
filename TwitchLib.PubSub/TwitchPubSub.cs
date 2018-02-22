@@ -89,29 +89,29 @@ namespace TwitchLib.PubSub
             if (proxy != null)
                 _socket.Proxy = new HttpConnectProxy(proxy);
         }
-
+        
         private void OnError(object sender, ErrorEventArgs e)
         {
-            _logger?.LogInformation($"[TwitchPubSub]OnError: {e.Exception.Message}");
+            _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
         private void OnMessage(object sender, MessageReceivedEventArgs e)
         {
-            _logger?.LogInformation($"[TwitchPubSub] {e.Message}");
+            _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);
         }
 
         private void Socket_OnDisconnected(object sender, EventArgs e)
         {
-            _logger?.LogInformation("[TwitchPubSub]OnClose");
+            _logger?.LogWarning("PubSub Websocket connection closed");
             _pingTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
         }
 
         private void Socket_OnConnected(object sender, EventArgs e)
         {
-            _logger?.LogInformation("[TwitchPubSub]OnOpen!");
+            _logger?.LogInformation("PubSub Websocket connection established");
             _pingTimer.Interval = 180000;
             _pingTimer.Elapsed += PingTimerTick;
             _pingTimer.Start();
