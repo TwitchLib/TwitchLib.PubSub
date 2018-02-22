@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using TwitchLib.PubSub.Enums;
 
 namespace TwitchLib.PubSub.Common
 {
