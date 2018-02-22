@@ -1,5 +1,4 @@
-﻿using System;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Models.Responses

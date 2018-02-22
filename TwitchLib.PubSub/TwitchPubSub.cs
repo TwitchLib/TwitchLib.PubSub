@@ -12,6 +12,7 @@ using TwitchLib.PubSub.Models;
 using System.Net;
 using SuperSocket.ClientEngine.Proxy;
 using Microsoft.Extensions.Logging;
+using TwitchLib.PubSub.Interfaces;
 
 namespace TwitchLib.PubSub
 {
@@ -23,12 +24,6 @@ namespace TwitchLib.PubSub
         private readonly ILogger<TwitchPubSub> _logger;
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
-
-        /*
-        NON-IMPLEMENTED AVAILABLE TOPICS (i'm aware of):
-        whispers.account_name - Requires OAUTH
-        video-playback.channelid
-        */
 
         #region Events
         /// <summary>EventHandler for named event.</summary>
@@ -78,9 +73,9 @@ namespace TwitchLib.PubSub
         #endregion
 
         /// <summary>
-        /// Constructor for a client that interface's with Twitch's new PubSub system.
+        /// Constructor for a client that interface's with Twitch's PubSub system.
         /// </summary>
-        /// <param name="logging">Set this true to have raw messages from PubSub system printed to console.</param>
+        /// <param name="logger">Optional ILogger param to enable logging</param>
         /// <param name="proxy">Optional IPEndpoint param to enable proxy support</param>
         public TwitchPubSub(ILogger<TwitchPubSub> logger = null, EndPoint proxy = null)
         {
@@ -94,29 +89,29 @@ namespace TwitchLib.PubSub
             if (proxy != null)
                 _socket.Proxy = new HttpConnectProxy(proxy);
         }
-
+        
         private void OnError(object sender, ErrorEventArgs e)
         {
-            _logger?.LogInformation($"[TwitchPubSub]OnError: {e.Exception.Message}");
+            _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
         private void OnMessage(object sender, MessageReceivedEventArgs e)
         {
-            _logger?.LogInformation($"[TwitchPubSub] {e.Message}");
+            _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);
         }
 
         private void Socket_OnDisconnected(object sender, EventArgs e)
         {
-            _logger?.LogInformation("[TwitchPubSub]OnClose");
+            _logger?.LogWarning("PubSub Websocket connection closed");
             _pingTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
         }
 
         private void Socket_OnConnected(object sender, EventArgs e)
         {
-            _logger?.LogInformation("[TwitchPubSub]OnOpen!");
+            _logger?.LogInformation("PubSub Websocket connection established");
             _pingTimer.Interval = 180000;
             _pingTimer.Elapsed += PingTimerTick;
             _pingTimer.Start();

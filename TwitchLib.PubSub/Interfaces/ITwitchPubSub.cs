@@ -1,7 +1,7 @@
 ﻿using System;
 using TwitchLib.PubSub.Events;
 
-namespace TwitchLib.PubSub
+namespace TwitchLib.PubSub.Interfaces
 {
     public interface ITwitchPubSub
     {
