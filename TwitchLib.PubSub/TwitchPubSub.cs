@@ -24,12 +24,6 @@ namespace TwitchLib.PubSub
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
 
-        /*
-        NON-IMPLEMENTED AVAILABLE TOPICS (i'm aware of):
-        whispers.account_name - Requires OAUTH
-        video-playback.channelid
-        */
-
         #region Events
         /// <summary>EventHandler for named event.</summary>
         public event EventHandler OnPubSubServiceConnected;
@@ -78,9 +72,9 @@ namespace TwitchLib.PubSub
         #endregion
 
         /// <summary>
-        /// Constructor for a client that interface's with Twitch's new PubSub system.
+        /// Constructor for a client that interface's with Twitch's PubSub system.
         /// </summary>
-        /// <param name="logging">Set this true to have raw messages from PubSub system printed to console.</param>
+        /// <param name="logger">Optional ILogger param to enable logging</param>
         /// <param name="proxy">Optional IPEndpoint param to enable proxy support</param>
         public TwitchPubSub(ILogger<TwitchPubSub> logger = null, EndPoint proxy = null)
         {
