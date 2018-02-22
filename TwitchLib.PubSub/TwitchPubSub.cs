@@ -12,6 +12,7 @@ using TwitchLib.PubSub.Models;
 using System.Net;
 using SuperSocket.ClientEngine.Proxy;
 using Microsoft.Extensions.Logging;
+using TwitchLib.PubSub.Interfaces;
 
 namespace TwitchLib.PubSub
 {
