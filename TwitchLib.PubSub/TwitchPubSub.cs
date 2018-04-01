@@ -61,6 +61,8 @@ namespace TwitchLib.PubSub
         /// <summary>EventHandler for named event.</summary>
         public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
         /// <summary>EventHandler for named event.</summary>
+        public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
+        /// <summary>EventHandler for named event.</summary>
         public event EventHandler<OnStreamUpArgs> OnStreamUp;
         /// <summary>EventHandler for named event.</summary>
         public event EventHandler<OnStreamDownArgs> OnStreamDown;
@@ -89,7 +91,7 @@ namespace TwitchLib.PubSub
             if (proxy != null)
                 _socket.Proxy = new HttpConnectProxy(proxy);
         }
-        
+
         private void OnError(object sender, ErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
@@ -225,6 +227,23 @@ namespace TwitchLib.PubSub
                                     TotalBitsUsed = cbe.TotalBitsUsed,
                                     UserId = cbe.UserId,
                                     Username = cbe.Username
+                                });
+                            return;
+                        case "channel-commerce-events-v1":
+                            if (msg.MessageData is ChannelCommerceEvents cce)
+                                OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
+                                {
+
+                                    Username = cce.Username,
+                                    DisplayName = cce.DisplayName,
+                                    ChannelName = cce.ChannelName,
+                                    UserId = cce.UserId,
+                                    ChannelId = cce.ChannelId,
+                                    Time = cce.Time,
+                                    ItemImageURL = cce.ItemImageURL,
+                                    ItemDescription = cce.ItemDescription,
+                                    SupportsChannel = cce.SupportsChannel,
+                                    PurchaseMessage = cce.PurchaseMessage
                                 });
                             return;
                         case "video-playback":
