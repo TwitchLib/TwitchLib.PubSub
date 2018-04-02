@@ -1,6 +1,6 @@
 ﻿namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Object representing the arguments for bits received event</summary>
+    /// <summary>Object representing the arguments for channel commerce event</summary>
     public class OnChannelCommerceReceivedArgs
     {
         /// <summary>Property for username.</summary>
