@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
-    /// <summary>Model representing the data in a channel bits event.</summary>
+    /// <summary>Model representing the data in a channel commerce event.</summary>
     public class ChannelCommerceEvents : MessageData
     {
         /// <summary>Username of the buyer.</summary>
