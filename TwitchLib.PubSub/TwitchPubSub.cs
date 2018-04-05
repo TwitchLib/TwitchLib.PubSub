@@ -26,51 +26,51 @@ namespace TwitchLib.PubSub
         private readonly List<string> _topicList = new List<string>();
 
         #region Events
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub Service is connected.</summary>
         public event EventHandler OnPubSubServiceConnected;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub Service has an error.</summary>
         public event EventHandler<OnPubSubServiceErrorArgs> OnPubSubServiceError;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub Service is closed.</summary>
         public event EventHandler OnPubSubServiceClosed;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives any response.</summary>
         public event EventHandler<OnListenResponseArgs> OnListenResponse;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice a viewer gets a timeout.</summary>
         public event EventHandler<OnTimeoutArgs> OnTimeout;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice a viewer gets banned.</summary>
         public event EventHandler<OnBanArgs> OnBan;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice a viewer gets unbanned.</summary>
         public event EventHandler<OnUnbanArgs> OnUnban;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice a viewer gets a timeout removed.</summary>
         public event EventHandler<OnUntimeoutArgs> OnUntimeout;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that the channel being listened to is hosting another channel.</summary>
         public event EventHandler<OnHostArgs> OnHost;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that Sub-Only Mode gets turned on.</summary>
         public event EventHandler<OnSubscribersOnlyArgs> OnSubscribersOnly;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that Sub-Only Mode gets turned off.</summary>
         public event EventHandler<OnSubscribersOnlyOffArgs> OnSubscribersOnlyOff;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that chat gets cleared.</summary>
         public event EventHandler<OnClearArgs> OnClear;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that Emote-Only Mode gets turned on.</summary>
         public event EventHandler<OnEmoteOnlyArgs> OnEmoteOnly;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that Emote-Only Mode gets turned off.</summary>
         public event EventHandler<OnEmoteOnlyOffArgs> OnEmoteOnlyOff;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that the chat option R9kBeta gets turned on.</summary>
         public event EventHandler<OnR9kBetaArgs> OnR9kBeta;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that the chat option R9kBeta gets turned off.</summary>
         public event EventHandler<OnR9kBetaOffArgs> OnR9kBetaOff;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice of a bit donation.</summary>
         public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice of a commerce transaction.</summary>
         public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that the stream of the channel being listened to goes online.</summary>
         public event EventHandler<OnStreamUpArgs> OnStreamUp;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice that the stream of the channel being listened to goes offline.</summary>
         public event EventHandler<OnStreamDownArgs> OnStreamDown;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives notice view count has changed.</summary>
         public event EventHandler<OnViewCountArgs> OnViewCount;
-        /// <summary>EventHandler for named event.</summary>
+        /// <summary>Fires when PubSub receives a whisper.</summary>
         public event EventHandler<OnWhisperArgs> OnWhisper;
-        /// <summary>EventHandler for channel subscriptions.</summary>
+        /// <summary>Fires when PubSub receives notice when the channel being listened to gets a subscription.</summary>
         public event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
         #endregion
 
