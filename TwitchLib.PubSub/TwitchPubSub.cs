@@ -72,6 +72,8 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnWhisperArgs> OnWhisper;
         /// <summary>Fires when PubSub receives notice when the channel being listened to gets a subscription.</summary>
         public event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
+        /// <summary>Fires when PubSub receives a message sent to the specified extension on the specified channel.</summary>
+        public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
         #endregion
 
         /// <summary>
@@ -246,6 +248,10 @@ namespace TwitchLib.PubSub
                                     PurchaseMessage = cce.PurchaseMessage
                                 });
                             return;
+                        case "channel-ext-v1":
+                            var cEB = msg.MessageData as ChannelExtensionBroadcast;
+                            OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages });
+                            break;
                         case "video-playback":
                             var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
@@ -329,6 +335,16 @@ namespace TwitchLib.PubSub
         public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
         {
             ListenToTopic($"chat_moderator_actions.{myTwitchId}.{channelTwitchId}");
+        }
+
+        /// <summary>
+        /// Sends a request to ListenOn EBS broadcasts sent to a specific extension on a specific channel.
+        /// </summary>
+        /// <param name="channelId">Id of the channel that the extension lives on.</param>
+        /// <param name="extensionId"></param>
+        public void ListenToChannelExtensionBroadcast(string channelId, string extensionId)
+        {
+            ListenToTopic($"channel-ext-v1.{channelId}-{extensionId}-broadcast");
         }
 
         /// <summary>
