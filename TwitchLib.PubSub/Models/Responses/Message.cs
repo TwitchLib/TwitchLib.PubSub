@@ -34,6 +34,9 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "channel-subscribe-events-v1":
                     MessageData = new ChannelSubscription(encodedJsonMessage);
                     break;
+                case "following":
+                    MessageData = new Following(encodedJsonMessage);
+                    break;
             }
         }
     }
