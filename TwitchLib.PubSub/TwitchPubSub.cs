@@ -74,6 +74,9 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
         /// <summary>Fires when PubSub receives a message sent to the specified extension on the specified channel.</summary>
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
+        /// <summary>Fires when PubSub receives notice when a user follows the designated channel.</summary>
+        public event EventHandler<OnFollowArgs> OnFollow;
+>>>>>>> master
         #endregion
 
         /// <summary>
@@ -143,7 +146,9 @@ namespace TwitchLib.PubSub
                         foreach (var request in _previousRequests)
                         {
                             if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
+                            {
                                 OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                            }
                         }
                         return;
                     }
@@ -267,6 +272,11 @@ namespace TwitchLib.PubSub
                                     return;
                             }
                             break;
+                        case "following":
+                            var f = msg.MessageData as Following;
+                            f.FollowedChannelId = msg.Topic.Split('.')[1];
+                            OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
+                            break;
                     }
                     break;
             }
@@ -326,6 +336,14 @@ namespace TwitchLib.PubSub
         }
 
         #region Listeners
+        /// <summary>
+        /// Sends a request to listenOn follows coming into a specified channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel ID to watch for new followers on.</param>
+        public void ListenToFollows(string channelId)
+        {
+            ListenToTopic($"following.{channelId}");
+        }
 
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
