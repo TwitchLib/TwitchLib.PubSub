@@ -76,7 +76,6 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
         /// <summary>Fires when PubSub receives notice when a user follows the designated channel.</summary>
         public event EventHandler<OnFollowArgs> OnFollow;
->>>>>>> master
         #endregion
 
         /// <summary>
