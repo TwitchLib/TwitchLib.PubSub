@@ -36,6 +36,7 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "channel-ext-v1":
                     MessageData = new ChannelExtensionBroadcast(encodedJsonMessage);
+                    break;
                 case "following":
                     MessageData = new Following(encodedJsonMessage);
                     break;
