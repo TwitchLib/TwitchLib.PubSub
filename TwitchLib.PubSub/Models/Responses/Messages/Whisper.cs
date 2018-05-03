@@ -9,10 +9,14 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
     {
         /// <summary>Type of MessageData</summary>
         public string Type { get; protected set; }
+        /// <summary>Enum of the Message type</summary>
+        public Enums.WhisperType TypeEnum { get; protected set; }
         /// <summary>Data identifier in MessageData</summary>
         public string Data { get; protected set; }
         /// <summary>Object that houses the data accompanying the type.</summary>
-        public DataObj DataObject { get; protected set; }
+        public DataObjWhisperReceived DataObjectWhisperReceived { get; protected set; }
+        /// <summary>Object that houses the data accompanying the type.</summary>
+        public DataObjThread DataObjectThread { get; protected set; }
 
         /// <summary>Whisper object constructor.</summary>
         public Whisper(string jsonStr)
@@ -20,11 +24,55 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             var json = JObject.Parse(jsonStr);
             Type = json.SelectToken("type").ToString();
             Data = json.SelectToken("data").ToString();
-            DataObject = new DataObj(json.SelectToken("data_object"));
+            switch (Type)
+            {
+                case "whisper_received":
+                    TypeEnum = Enums.WhisperType.WhisperReceived;
+                    DataObjectWhisperReceived = new DataObjWhisperReceived(json.SelectToken("data_object"));
+                    break;
+                case "thread":
+                    TypeEnum = Enums.WhisperType.Thread;
+                    DataObjectThread = new DataObjThread(json.SelectToken("data_object"));
+                    break;
+                default:
+                    TypeEnum = Enums.WhisperType.Unknown;
+                    break;
+            }
+        }
+
+        public class DataObjThread
+        {
+            public string Id { get; protected set; }
+            public long LastRead { get; protected set; }
+            public bool Archived { get; protected set; }
+            public bool Muted { get; protected set; }
+            public SpamInfoObj SpamInfo { get; protected set; }
+
+            public DataObjThread(JToken json)
+            {
+                Id = json.SelectToken("id").ToString(); 
+                LastRead = long.Parse(json.SelectToken("last_read").ToString());
+                Archived = bool.Parse(json.SelectToken("archived").ToString());
+                Muted = bool.Parse(json.SelectToken("muted").ToString());
+                SpamInfo = new SpamInfoObj(json.SelectToken("spam_info"));
+            }
+
+            public class SpamInfoObj
+            {
+                public string Likelihood { get; protected set; }
+                public long LastMarkedNotSpam { get; protected set; }
+
+                public SpamInfoObj(JToken json)
+                {
+                    Likelihood = json.SelectToken("likelihood").ToString();
+                    LastMarkedNotSpam = long.Parse(json.SelectToken("last_marked_not_spam").ToString());
+                }
+            }
+
         }
 
         /// <summary>Class representing the data in the MessageData object.</summary>
-        public class DataObj
+        public class DataObjWhisperReceived
         {
             /// <summary>DataObject identifier</summary>
             public string Id { get; protected set; }
@@ -44,7 +92,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             public string Nonce { get; protected set; }
 
             /// <summary>DataObj constructor.</summary>
-            public DataObj(JToken json)
+            public DataObjWhisperReceived(JToken json)
             {
                 Id = json.SelectToken("id").ToString();
                 ThreadId = json.SelectToken("thread_id")?.ToString();
@@ -67,8 +115,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 public string Color { get; protected set; }
                 /// <summary>User type of whisperer</summary>
                 public string UserType { get; protected set; }
-                /// <summary>True or false for whether whisperer is turbo</summary>
-                public bool Turbo { get; protected set; }
                 /// <summary>List of emotes found in whisper</summary>
                 public readonly List<EmoteObj> Emotes = new List<EmoteObj>();
                 /// <summary>All badges associated with the whisperer</summary>
@@ -81,7 +127,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     DisplayName = json.SelectToken("login")?.ToString();
                     Color = json.SelectToken("color")?.ToString();
                     UserType = json.SelectToken("user_type")?.ToString();
-                    Turbo = bool.Parse(json.SelectToken("turbo").ToString());
                     foreach(var emote in json.SelectToken("emotes"))
                         Emotes.Add(new EmoteObj(emote));
                     foreach (var badge in json.SelectToken("badges"))
@@ -121,10 +166,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 public string Color { get; protected set; }
                 /// <summary>User type of receiver.</summary>
                 public string UserType { get; protected set; }
-                /// <summary>True or false on whther receiver has turbo or not.</summary>
-                public bool Turbo { get; protected set; }
                 /// <summary>List of badges that the receiver has.</summary>
-                public List<Badge> Badges { get; protected set; }
+                public List<Badge> Badges { get; protected set; } = new List<Badge>();
 
                 /// <summary>RecipientObj constructor.</summary>
                 public RecipientObj(JToken json)
@@ -134,11 +177,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     DisplayName = json.SelectToken("display_name")?.ToString();
                     Color = json.SelectToken("color")?.ToString();
                     UserType = json.SelectToken("user_type")?.ToString();
-                    Turbo = bool.Parse(json.SelectToken("turbo").ToString());
-                    Badges = new List<Badge>();
                     foreach (var badge in json.SelectToken("badges"))
                         Badges.Add(new Badge(badge));
-
                 }
             }
 
