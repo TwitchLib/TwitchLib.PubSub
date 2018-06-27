@@ -23,7 +23,6 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
-    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452'">
@@ -33,6 +32,14 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
     <DefineConstants>NETSTANDARD</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452'">
+    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <ProjectReference Include="..\..\TwitchLib.Websockets\TwitchLib.Websockets.csproj" />
+  </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>

@@ -3,29 +3,37 @@ using System.Linq;
 using System.Timers;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using WebSocket4Net;
-using SuperSocket.ClientEngine;
 using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Models.Responses.Messages;
 using TwitchLib.PubSub.Enums;
 using TwitchLib.PubSub.Models;
-using System.Net;
-using SuperSocket.ClientEngine.Proxy;
 using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
+#if NET452
+using WebSocket4Net;
+using SuperSocket.ClientEngine;
+using SuperSocket.ClientEngine.Proxy;
+using System.Net;
+#elif NETSTANDARD
+using TwitchLib.Websockets;
+#endif
 
 namespace TwitchLib.PubSub
 {
     /// <summary>Class represneting interactions with the Twitch PubSub</summary>
     public class TwitchPubSub : ITwitchPubSub
     {
+#if NET452
         private readonly WebSocket _socket;
+#elif NETSTANDARD
+        private readonly WebsocketClient _socket;
+#endif
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
         private readonly ILogger<TwitchPubSub> _logger;
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
 
-        #region Events
+#region Events
         /// <summary>Fires when PubSub Service is connected.</summary>
         public event EventHandler OnPubSubServiceConnected;
         /// <summary>Fires when PubSub Service has an error.</summary>
@@ -78,6 +86,7 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         #endregion
 
+#if NET452
         /// <summary>
         /// Constructor for a client that interface's with Twitch's PubSub system.
         /// </summary>
@@ -86,6 +95,7 @@ namespace TwitchLib.PubSub
         public TwitchPubSub(ILogger<TwitchPubSub> logger = null, EndPoint proxy = null)
         {
             _logger = logger;
+
             _socket = new WebSocket("wss://pubsub-edge.twitch.tv");
             _socket.Opened += Socket_OnConnected;
             _socket.Error += OnError;
@@ -94,8 +104,28 @@ namespace TwitchLib.PubSub
 
             if (proxy != null)
                 _socket.Proxy = new HttpConnectProxy(proxy);
-        }
 
+        }
+#elif NETSTANDARD
+        /// <summary>
+        /// Constructor for a client that interface's with Twitch's PubSub system.
+        /// </summary>
+        /// <param name="logger">Optional ILogger param to enable logging</param>
+        public TwitchPubSub(ILogger<TwitchPubSub> logger = null)
+        {
+            _logger = logger;
+
+            var options = new WebsocketClientOptions() { ClientType = Websockets.Enums.ClientType.PubSub };
+            _socket = new WebsocketClient(options);
+
+            _socket.OnConnected += Socket_OnConnected;
+            _socket.OnError += OnError;
+            _socket.OnMessage += OnMessage; ;
+            _socket.OnDisconnected += Socket_OnDisconnected;
+        }
+#endif
+
+#if NET452
         private void OnError(object sender, ErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
@@ -107,6 +137,19 @@ namespace TwitchLib.PubSub
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);
         }
+#elif NETSTANDARD
+        private void OnError(object sender, Websockets.Events.OnErrorEventArgs e)
+        {
+            _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
+            OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
+        }
+
+        private void OnMessage(object sender, Websockets.Events.OnMessageEventArgs e)
+        {
+            _logger?.LogDebug($"Received Websocket Message: {e.Message}");
+            ParseMessage(e.Message);
+        }
+#endif
 
         private void Socket_OnDisconnected(object sender, EventArgs e)
         {
@@ -334,7 +377,7 @@ namespace TwitchLib.PubSub
             _logger?.LogInformation($"[TwitchPubSub] {message}");
         }
 
-        #region Listeners
+#region Listeners
         /// <summary>
         /// Sends a request to listenOn follows coming into a specified channel.
         /// </summary>
@@ -408,7 +451,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-subscribe-events-v1.{channelId}");
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Method to connect to Twitch's PubSub service. You MUST listen toOnConnected event and listen to a Topic within 15 seconds of connecting (or be disconnected)
