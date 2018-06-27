@@ -15,7 +15,7 @@ using SuperSocket.ClientEngine;
 using SuperSocket.ClientEngine.Proxy;
 using System.Net;
 #elif NETSTANDARD
-using TwitchLib.Websockets;
+using TwitchLib.WebSocket;
 #endif
 
 namespace TwitchLib.PubSub
@@ -26,7 +26,7 @@ namespace TwitchLib.PubSub
 #if NET452
         private readonly WebSocket _socket;
 #elif NETSTANDARD
-        private readonly WebsocketClient _socket;
+        private readonly WebSocketClient _socket;
 #endif
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
         private readonly ILogger<TwitchPubSub> _logger;
@@ -115,8 +115,8 @@ namespace TwitchLib.PubSub
         {
             _logger = logger;
 
-            var options = new WebsocketClientOptions() { ClientType = Websockets.Enums.ClientType.PubSub };
-            _socket = new WebsocketClient(options);
+            var options = new WebSocketClientOptions() { ClientType = WebSocket.Enums.ClientType.PubSub };
+            _socket = new WebSocketClient(options);
 
             _socket.OnConnected += Socket_OnConnected;
             _socket.OnError += OnError;
@@ -138,13 +138,13 @@ namespace TwitchLib.PubSub
             ParseMessage(e.Message);
         }
 #elif NETSTANDARD
-        private void OnError(object sender, Websockets.Events.OnErrorEventArgs e)
+        private void OnError(object sender, WebSocket.Events.OnErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
-        private void OnMessage(object sender, Websockets.Events.OnMessageEventArgs e)
+        private void OnMessage(object sender, WebSocket.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);

@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.PubSub", "TwitchLib.PubSub\TwitchLib.PubSub.csproj", "{BF806D39-66B7-41CF-9406-5383B22D5677}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Websockets", "..\TwitchLib.Websockets\TwitchLib.Websockets.csproj", "{EEDB18AE-526F-4A80-AC2B-E98ABB9537FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.WebSocket", "..\TwitchLib.WebSocket\TwitchLib.WebSocket.csproj", "{EEDB18AE-526F-4A80-AC2B-E98ABB9537FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

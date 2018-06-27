@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <ProjectReference Include="..\..\TwitchLib.Websockets\TwitchLib.Websockets.csproj" />
+    <ProjectReference Include="..\..\TwitchLib.WebSocket\TwitchLib.WebSocket.csproj" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
