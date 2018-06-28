@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.PubSub", "TwitchLib.PubSub\TwitchLib.PubSub.csproj", "{BF806D39-66B7-41CF-9406-5383B22D5677}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.WebSocket", "TwitchLib.WebSocket\TwitchLib.WebSocket.csproj", "{7AE87751-6442-4435-A8A4-5167C7712FF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AE87751-6442-4435-A8A4-5167C7712FF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AE87751-6442-4435-A8A4-5167C7712FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AE87751-6442-4435-A8A4-5167C7712FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AE87751-6442-4435-A8A4-5167C7712FF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
