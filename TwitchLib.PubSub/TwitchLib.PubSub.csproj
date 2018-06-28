@@ -23,6 +23,8 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
-    <ProjectReference Include="..\..\TwitchLib.WebSocket\TwitchLib.WebSocket.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TwitchLib.WebSocket\TwitchLib.WebSocket.csproj" />
   </ItemGroup>
 </Project>
