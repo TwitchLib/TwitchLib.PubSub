@@ -25,6 +25,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TwitchLib.WebSocket\TwitchLib.WebSocket.csproj" />
+    <ProjectReference Include="..\TwitchLib.Communication\TwitchLib.Communication.csproj" />
   </ItemGroup>
 </Project>
