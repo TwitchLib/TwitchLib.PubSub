@@ -9,7 +9,7 @@ using TwitchLib.PubSub.Enums;
 using TwitchLib.PubSub.Models;
 using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
-using TwitchLib.WebSocket;
+using TwitchLib.Communication;
 
 namespace TwitchLib.PubSub
 {
@@ -83,7 +83,7 @@ namespace TwitchLib.PubSub
         {
             _logger = logger;
 
-            var options = new WebSocketClientOptions() { ClientType = WebSocket.Enums.ClientType.PubSub };
+            var options = new ClientOptions() { ClientType = Communication.Enums.ClientType.PubSub };
             _socket = new WebSocketClient(options);
 
             _socket.OnConnected += Socket_OnConnected;
@@ -92,13 +92,13 @@ namespace TwitchLib.PubSub
             _socket.OnDisconnected += Socket_OnDisconnected;
         }
 
-        private void OnError(object sender, WebSocket.Events.OnErrorEventArgs e)
+        private void OnError(object sender, Communication.Events.OnErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
-        private void OnMessage(object sender, WebSocket.Events.OnMessageEventArgs e)
+        private void OnMessage(object sender, Communication.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);
