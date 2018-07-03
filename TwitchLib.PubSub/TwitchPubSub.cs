@@ -372,10 +372,10 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends request to listenOn channel commerce events in specific channel
         /// </summary>
-        /// <param name="channelName">Name of channel to listen to commerce events in.</param>
-        public void ListenToCommerce(string channelName)
+        /// <param name="channelTwitchId">Channel Id of channel to listen to commerce events on.</param>
+        public void ListenToCommerce(string channelTwitchId)
         {
-            ListenToTopic($"channel-commerce-events-v1.{channelName}");
+            ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
         }
         
         /// <summary>
