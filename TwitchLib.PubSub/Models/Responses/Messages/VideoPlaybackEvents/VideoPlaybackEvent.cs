@@ -5,7 +5,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>VideoPlayback model constructor.</summary>
-    public class VideoPlayback : MessageData
+    public class VideoPlaybackEvent : MessageData
     {
         /// <summary>Video playback type</summary>
         public VideoPlaybackType Type { get; protected set; }
@@ -18,7 +18,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 
         /// <summary>VideoPlayback constructor.</summary>
         /// <param name="jsonStr"></param>
-        public VideoPlayback(string jsonStr)
+        public VideoPlaybackEvent(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             switch (json.SelectToken("type").ToString())
@@ -33,6 +33,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Type = VideoPlaybackType.ViewCount;
                     break;
             }
+
             ServerTime = json.SelectToken("server_time")?.ToString();
             switch (Type)
             {

@@ -13,6 +13,8 @@ using TwitchLib.Communication;
 
 namespace TwitchLib.PubSub
 {
+    using Common;
+
     /// <summary>Class represneting interactions with the Twitch PubSub</summary>
     public class TwitchPubSub : ITwitchPubSub
     {
@@ -153,15 +155,31 @@ namespace TwitchLib.PubSub
                     switch (msg.Topic.Split('.')[0])
                     {
                         case "channel-subscribe-events-v1":
-                            var subscription = msg.MessageData as ChannelSubscription;
-                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription });
+                            var subscription = msg.MessageData as ChannelSubscriptionEvent;
+                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { SubscriptionEvent = subscription });
                             return;
                         case "whispers":
-                            var whisper = (Whisper)msg.MessageData;
-                            OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper });
+                            if (msg.MessageData is WhisperEvent whisper)
+                                OnWhisper?.Invoke(this, new OnWhisperArgs
+                                {
+                                    SentTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Unspecified).AddSeconds(whisper.DataObjectWhisperReceived.SentTs),
+                                    //SentTimestamp = DateTimeOffset.FromUnixTimeSeconds(whisper.DataObjectWhisperReceived.SentTs).DateTime, --> 4.6 + or .Net Standard
+                                    SenderId = whisper.DataObjectWhisperReceived.Id,
+                                    SenderUsername = whisper.DataObjectWhisperReceived.Tags.Login,
+                                    SenderDisplayName = whisper.DataObjectWhisperReceived.Tags.DisplayName,
+                                    SenderColor = Helpers.ColorFromHex(whisper.DataObjectWhisperReceived.Tags.Color),
+                                    SenderEmotes = whisper.DataObjectWhisperReceived.Tags.Emotes,
+                                    SenderBadges = whisper.DataObjectWhisperReceived.Tags.Badges,
+                                    Body = whisper.DataObjectWhisperReceived.Body,
+                                    RecipientId = whisper.DataObjectWhisperReceived.Recipient.Id,
+                                    RecipientUsername = whisper.DataObjectWhisperReceived.Recipient.Username,
+                                    RecipientDisplayName = whisper.DataObjectWhisperReceived.Recipient.DisplayName,
+                                    RecipientColor = Helpers.ColorFromHex(whisper.DataObjectWhisperReceived.Recipient.Color),
+                                    RecipientBadges = whisper.DataObjectWhisperReceived.Recipient.Badges,
+                                });
                             return;
                         case "chat_moderator_actions":
-                            var cma = msg.MessageData as ChatModeratorActions;
+                            var cma = msg.MessageData as ChatModeratorActionEvent;
                             var reason = "";
                             switch (cma?.ModerationAction.ToLower())
                             {
@@ -217,7 +235,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "channel-bits-events-v1":
-                            if (msg.MessageData is ChannelBitsEvents cbe)
+                            if (msg.MessageData is ChannelBitsEvent cbe)
                                 OnBitsReceived?.Invoke(this, new OnBitsReceivedArgs
                                 {
                                     BitsUsed = cbe.BitsUsed,
@@ -232,7 +250,7 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-commerce-events-v1":
-                            if (msg.MessageData is ChannelCommerceEvents cce)
+                            if (msg.MessageData is ChannelCommerceEvent cce)
                                 OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
                                 {
 
@@ -249,11 +267,11 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-ext-v1":
-                            var cEB = msg.MessageData as ChannelExtensionBroadcast;
+                            var cEB = msg.MessageData as ChannelExtensionBroadcastEvent;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages });
                             break;
                         case "video-playback":
-                            var vP = msg.MessageData as VideoPlayback;
+                            var vP = msg.MessageData as VideoPlaybackEvent;
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
@@ -268,7 +286,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "following":
-                            var f = msg.MessageData as Following;
+                            var f = msg.MessageData as FollowEvent;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             break;

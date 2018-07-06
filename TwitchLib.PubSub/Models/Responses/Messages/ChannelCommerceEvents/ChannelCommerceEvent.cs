@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Model representing the data in a channel commerce event.</summary>
-    public class ChannelCommerceEvents : MessageData
+    public class ChannelCommerceEvent : MessageData
     {
         /// <summary>Username of the buyer.</summary>
         public string Username { get; protected set; }
@@ -29,7 +28,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public string PurchaseMessage { get; protected set; }
 
         /// <summary>ChannelBitsEvent model constructor.</summary>
-        public ChannelCommerceEvents(string jsonStr)
+        public ChannelCommerceEvent(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             Username = json.SelectToken("data").SelectToken("user_name")?.ToString();

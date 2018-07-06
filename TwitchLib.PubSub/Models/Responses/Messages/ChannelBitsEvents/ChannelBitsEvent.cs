@@ -4,7 +4,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Model representing the data in a channel bits event.</summary>
-    public class ChannelBitsEvents : MessageData
+    public class ChannelBitsEvent : MessageData
     {
         /// <summary>Username of the sender.</summary>
         public string Username { get; protected set; }
@@ -26,7 +26,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public string Context { get; protected set; }
 
         /// <summary>ChannelBitsEvent model constructor.</summary>
-        public ChannelBitsEvents(string jsonStr)
+        public ChannelBitsEvent(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             Username = json.SelectToken("data").SelectToken("user_name")?.ToString();

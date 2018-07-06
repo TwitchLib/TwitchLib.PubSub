@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
-    /// <summary>ChatModeratorActions model.</summary>
-    public class ChatModeratorActions : MessageData
+    /// <summary>ChatModeratorActionEvent model.</summary>
+    public class ChatModeratorActionEvent : MessageData
     {
         /// <summary>Topic relevant to this messagedata type.</summary>
         public string Type { get; protected set; }
@@ -20,8 +20,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>User Id of user that received Action.</summary>
         public string TargetUserId { get; protected set; }
 
-        /// <summary>ChatModeratorActions model constructor.</summary>
-        public ChatModeratorActions(string jsonStr)
+        /// <summary>ChatModeratorActionEvent model constructor.</summary>
+        public ChatModeratorActionEvent(string jsonStr)
         {
             var json = JObject.Parse(jsonStr).SelectToken("data");
             Type = json.SelectToken("type")?.ToString();

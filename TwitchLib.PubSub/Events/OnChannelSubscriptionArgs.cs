@@ -4,6 +4,6 @@ namespace TwitchLib.PubSub.Events
 {
     public class OnChannelSubscriptionArgs
     {
-        public ChannelSubscription Subscription;
+        public ChannelSubscriptionEvent SubscriptionEvent;
     }
 }

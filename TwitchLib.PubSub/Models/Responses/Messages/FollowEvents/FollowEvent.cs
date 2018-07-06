@@ -1,13 +1,10 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Following model constructor.</summary>
-    public class Following : MessageData
+    public class FollowEvent : MessageData
     {
         /// <summary>Following user display name.</summary>
         public string DisplayName { get; protected set; }
@@ -19,7 +16,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 
         /// <summary>Following constructor.</summary>
         /// <param name="jsonStr"></param>
-        public Following(string jsonStr)
+        public FollowEvent(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             DisplayName = json["display_name"].ToString();

@@ -4,8 +4,8 @@ using System;
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
-    /// <summary>ChatModeratorActions model.</summary>
-    public class  ChannelSubscription: MessageData
+    /// <summary>ChannelSubscriptionEvent model.</summary>
+    public class ChannelSubscriptionEvent: MessageData
     {
         public string Username { get; protected set; }
         public string DisplayName { get; protected set; }
@@ -23,7 +23,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public SubMessage SubMessage { get; protected set; }
 
         /// <summary>ChatModeratorActions model constructor.</summary>
-        public ChannelSubscription(string jsonStr)
+        public ChannelSubscriptionEvent(string jsonStr)
         {
             JToken message = JObject.Parse(jsonStr);
             Username = message.SelectToken("user_name")?.ToString();
