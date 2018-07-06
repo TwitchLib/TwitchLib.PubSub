@@ -15,7 +15,6 @@ namespace TwitchLib.PubSub.Common
             return dateTime == null ? new DateTime() : Convert.ToDateTime(dateTime);
         }
         
-
         public static string Base64Encode(string plainText)
         {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
@@ -28,9 +27,7 @@ namespace TwitchLib.PubSub.Common
                 return default(Color);
 
             if (int.TryParse(hex.Replace("#", ""), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out var argb))
-            {
                 return Color.FromArgb(argb);
-            }
 
             return default(Color);
         }
