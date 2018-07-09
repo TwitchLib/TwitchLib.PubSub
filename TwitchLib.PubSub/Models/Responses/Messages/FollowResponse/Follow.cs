@@ -4,7 +4,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Following model constructor.</summary>
-    public class FollowEvent : MessageData
+    public class Follow : MessageData
     {
         /// <summary>Following user display name.</summary>
         public string DisplayName { get; protected set; }
@@ -16,7 +16,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 
         /// <summary>Following constructor.</summary>
         /// <param name="jsonStr"></param>
-        public FollowEvent(string jsonStr)
+        public Follow(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             DisplayName = json["display_name"].ToString();

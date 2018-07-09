@@ -10,11 +10,10 @@ using TwitchLib.PubSub.Models;
 using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
+using TwitchLib.PubSub.Common;
 
 namespace TwitchLib.PubSub
 {
-    using Common;
-
     /// <summary>Class represneting interactions with the Twitch PubSub</summary>
     public class TwitchPubSub : ITwitchPubSub
     {
@@ -155,11 +154,11 @@ namespace TwitchLib.PubSub
                     switch (msg.Topic.Split('.')[0])
                     {
                         case "channel-subscribe-events-v1":
-                            var subscription = msg.MessageData as ChannelSubscriptionEvent;
-                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { SubscriptionEvent = subscription });
+                            var subscription = msg.MessageData as ChannelSubscription;
+                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription });
                             return;
                         case "whispers":
-                            if (msg.MessageData is WhisperEvent whisper)
+                            if (msg.MessageData is Whisper whisper)
                                 OnWhisper?.Invoke(this, new OnWhisperArgs
                                 {
                                     SentTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Unspecified).AddSeconds(whisper.DataObjectWhisperReceived.SentTs),
@@ -179,7 +178,7 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "chat_moderator_actions":
-                            var cma = msg.MessageData as ChatModeratorActionEvent;
+                            var cma = msg.MessageData as ChatModeratorAction;
                             var reason = "";
                             switch (cma?.ModerationAction.ToLower())
                             {
@@ -235,7 +234,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "channel-bits-events-v1":
-                            if (msg.MessageData is ChannelBitsEvent cbe)
+                            if (msg.MessageData is ChannelBits cbe)
                                 OnBitsReceived?.Invoke(this, new OnBitsReceivedArgs
                                 {
                                     BitsUsed = cbe.BitsUsed,
@@ -250,7 +249,7 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-commerce-events-v1":
-                            if (msg.MessageData is ChannelCommerceEvent cce)
+                            if (msg.MessageData is ChannelCommerce cce)
                                 OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
                                 {
 
@@ -267,11 +266,11 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-ext-v1":
-                            var cEB = msg.MessageData as ChannelExtensionBroadcastEvent;
+                            var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages });
                             break;
                         case "video-playback":
-                            var vP = msg.MessageData as VideoPlaybackEvent;
+                            var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
@@ -286,7 +285,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "following":
-                            var f = msg.MessageData as FollowEvent;
+                            var f = msg.MessageData as Follow;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             break;

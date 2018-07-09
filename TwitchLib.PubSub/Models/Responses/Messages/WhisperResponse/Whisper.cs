@@ -6,7 +6,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Class representing a whisper received via PubSub.</summary>
-    public class WhisperEvent : MessageData
+    public class Whisper : MessageData
     {
         /// <summary>Type of MessageData</summary>
         public string Type { get; protected set; }
@@ -20,7 +20,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public DataObjThread DataObjectThread { get; protected set; }
 
         /// <summary>Whisper object constructor.</summary>
-        public WhisperEvent(string jsonStr)
+        public Whisper(string jsonStr)
         {
             var json = JObject.Parse(jsonStr);
             Type = json.SelectToken("type").ToString();

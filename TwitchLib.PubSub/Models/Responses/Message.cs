@@ -20,25 +20,25 @@ namespace TwitchLib.PubSub.Models.Responses
             switch (Topic?.Split('.')[0])
             {
                 case "chat_moderator_actions":
-                    MessageData = new ChatModeratorActionEvent(encodedJsonMessage);
+                    MessageData = new ChatModeratorAction(encodedJsonMessage);
                     break;
                 case "channel-bits-events-v1":
-                    MessageData = new ChannelBitsEvent(encodedJsonMessage);
+                    MessageData = new ChannelBits(encodedJsonMessage);
                     break;
                 case "video-playback":
-                    MessageData = new VideoPlaybackEvent(encodedJsonMessage);
+                    MessageData = new VideoPlayback(encodedJsonMessage);
                     break;
                 case "whispers":
-                    MessageData = new WhisperEvent(encodedJsonMessage);
+                    MessageData = new Whisper(encodedJsonMessage);
                     break;
                 case "channel-subscribe-events-v1":
-                    MessageData = new ChannelSubscriptionEvent(encodedJsonMessage);
+                    MessageData = new ChannelSubscription(encodedJsonMessage);
                     break;
                 case "channel-ext-v1":
-                    MessageData = new ChannelExtensionBroadcastEvent(encodedJsonMessage);
+                    MessageData = new ChannelExtensionBroadcast(encodedJsonMessage);
                     break;
                 case "following":
-                    MessageData = new FollowEvent(encodedJsonMessage);
+                    MessageData = new Follow(encodedJsonMessage);
                     break;
             }
         }

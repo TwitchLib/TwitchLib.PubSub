@@ -42,6 +42,6 @@ namespace TwitchLib.PubSub.Events
 
         /// <summary>Property representing the whisper object.</summary> 
         [Obsolete("The Whisper property is depreciated, use the properties within the OnWhisperArgs object itself.")]
-        public WhisperEvent Whisper;
+        public Whisper Whisper;
     }
 }

@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
-    /// <summary>ChatModeratorActionEvent model.</summary>
-    public class ChatModeratorActionEvent : MessageData
+    /// <summary>ChatModeratorAction model.</summary>
+    public class ChatModeratorAction : MessageData
     {
         /// <summary>Topic relevant to this messagedata type.</summary>
         public string Type { get; protected set; }
@@ -20,8 +20,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>User Id of user that received Action.</summary>
         public string TargetUserId { get; protected set; }
 
-        /// <summary>ChatModeratorActionEvent model constructor.</summary>
-        public ChatModeratorActionEvent(string jsonStr)
+        /// <summary>ChatModeratorAction model constructor.</summary>
+        public ChatModeratorAction(string jsonStr)
         {
             var json = JObject.Parse(jsonStr).SelectToken("data");
             Type = json.SelectToken("type")?.ToString();

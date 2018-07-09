@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.PubSub", "TwitchL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Communication", "TwitchLib.Communication\TwitchLib.Communication.csproj", "{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject", "TestProject\TestProject.csproj", "{C0F1B4FD-24E9-4266-B660-7A872350D721}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0F1B4FD-24E9-4266-B660-7A872350D721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0F1B4FD-24E9-4266-B660-7A872350D721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0F1B4FD-24E9-4266-B660-7A872350D721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0F1B4FD-24E9-4266-B660-7A872350D721}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

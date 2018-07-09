@@ -4,7 +4,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
     /// <summary>Model representing the data in a channel commerce event.</summary>
-    public class ChannelCommerceEvent : MessageData
+    public class ChannelCommerce : MessageData
     {
         /// <summary>Username of the buyer.</summary>
         public string Username { get; protected set; }
@@ -27,8 +27,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>Chat message that accompanied the purchase.</summary>
         public string PurchaseMessage { get; protected set; }
 
-        /// <summary>ChannelBitsEvent model constructor.</summary>
-        public ChannelCommerceEvent(string jsonStr)
+        /// <summary>ChannelBits model constructor.</summary>
+        public ChannelCommerce(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
             Username = json.SelectToken("data").SelectToken("user_name")?.ToString();
