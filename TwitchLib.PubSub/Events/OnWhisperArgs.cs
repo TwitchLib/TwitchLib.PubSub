@@ -10,7 +10,7 @@ namespace TwitchLib.PubSub.Events
     /// <summary>[INCOMPLETE/NOT_FULLY_SUPPORTED]Whisper arguement class.</summary>
     public class OnWhisperArgs
     {
-        /// <summary>TOOOOOOOOOOOOODOOOOOOOOO</summary>
+        /// <summary>The timestamp indicating when the whisper was sent</summary>
         public DateTime SentTimestamp;
 
         /// <summary>The TwitchId from the user who sent the message.</summary>
