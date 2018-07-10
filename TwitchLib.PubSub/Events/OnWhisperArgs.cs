@@ -1,12 +1,11 @@
 ﻿using TwitchLib.PubSub.Models.Responses.Messages;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using TwitchLib.PubSub.Models.Responses.Messages.Whispers;
 
 namespace TwitchLib.PubSub.Events
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Drawing;
-    using Models.Responses.Messages.Whispers;
-
     /// <summary>[INCOMPLETE/NOT_FULLY_SUPPORTED]Whisper arguement class.</summary>
     public class OnWhisperArgs
     {
