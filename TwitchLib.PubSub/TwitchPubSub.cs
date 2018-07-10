@@ -10,6 +10,7 @@ using TwitchLib.PubSub.Models;
 using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
+using TwitchLib.Communication.Models;
 using TwitchLib.PubSub.Common;
 
 namespace TwitchLib.PubSub
