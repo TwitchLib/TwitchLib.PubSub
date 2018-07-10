@@ -24,7 +24,7 @@ namespace TwitchLib.PubSub
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
 
-#region Events
+        #region Events
         /// <summary>Fires when PubSub Service is connected.</summary>
         public event EventHandler OnPubSubServiceConnected;
         /// <summary>Fires when PubSub Service has an error.</summary>
@@ -348,7 +348,7 @@ namespace TwitchLib.PubSub
             _logger?.LogInformation($"[TwitchPubSub] {message}");
         }
 
-#region Listeners
+        #region Listeners
         /// <summary>
         /// Sends a request to listenOn follows coming into a specified channel.
         /// </summary>
@@ -395,7 +395,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
         }
-        
+
         /// <summary>
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
@@ -422,7 +422,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-subscribe-events-v1.{channelId}");
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Method to connect to Twitch's PubSub service. You MUST listen toOnConnected event and listen to a Topic within 15 seconds of connecting (or be disconnected)
