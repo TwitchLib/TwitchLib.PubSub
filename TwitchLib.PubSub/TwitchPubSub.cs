@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub.Common;
 
 namespace TwitchLib.PubSub
 {
@@ -23,7 +24,7 @@ namespace TwitchLib.PubSub
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
 
-#region Events
+        #region Events
         /// <summary>Fires when PubSub Service is connected.</summary>
         public event EventHandler OnPubSubServiceConnected;
         /// <summary>Fires when PubSub Service has an error.</summary>
@@ -158,8 +159,24 @@ namespace TwitchLib.PubSub
                             OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription });
                             return;
                         case "whispers":
-                            var whisper = (Whisper)msg.MessageData;
-                            OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper });
+                            if (msg.MessageData is Whisper whisper)
+                                OnWhisper?.Invoke(this, new OnWhisperArgs
+                                {
+                                    SentTimestamp = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Unspecified).AddSeconds(whisper.DataObjectWhisperReceived.SentTs),
+                                    //SentTimestamp = DateTimeOffset.FromUnixTimeSeconds(whisper.DataObjectWhisperReceived.SentTs).DateTime, --> 4.6 + or .Net Standard
+                                    SenderId = whisper.DataObjectWhisperReceived.Id,
+                                    SenderUsername = whisper.DataObjectWhisperReceived.Tags.Login,
+                                    SenderDisplayName = whisper.DataObjectWhisperReceived.Tags.DisplayName,
+                                    SenderColor = Helpers.ColorFromHex(whisper.DataObjectWhisperReceived.Tags.Color),
+                                    SenderEmotes = whisper.DataObjectWhisperReceived.Tags.Emotes,
+                                    SenderBadges = whisper.DataObjectWhisperReceived.Tags.Badges,
+                                    Body = whisper.DataObjectWhisperReceived.Body,
+                                    RecipientId = whisper.DataObjectWhisperReceived.Recipient.Id,
+                                    RecipientUsername = whisper.DataObjectWhisperReceived.Recipient.Username,
+                                    RecipientDisplayName = whisper.DataObjectWhisperReceived.Recipient.DisplayName,
+                                    RecipientColor = Helpers.ColorFromHex(whisper.DataObjectWhisperReceived.Recipient.Color),
+                                    RecipientBadges = whisper.DataObjectWhisperReceived.Recipient.Badges,
+                                });
                             return;
                         case "chat_moderator_actions":
                             var cma = msg.MessageData as ChatModeratorActions;
@@ -331,7 +348,7 @@ namespace TwitchLib.PubSub
             _logger?.LogInformation($"[TwitchPubSub] {message}");
         }
 
-#region Listeners
+        #region Listeners
         /// <summary>
         /// Sends a request to listenOn follows coming into a specified channel.
         /// </summary>
@@ -378,7 +395,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
         }
-        
+
         /// <summary>
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
@@ -405,7 +422,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-subscribe-events-v1.{channelId}");
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Method to connect to Twitch's PubSub service. You MUST listen toOnConnected event and listen to a Topic within 15 seconds of connecting (or be disconnected)

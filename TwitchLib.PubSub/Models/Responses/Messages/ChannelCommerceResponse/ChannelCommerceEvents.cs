@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
@@ -28,7 +27,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>Chat message that accompanied the purchase.</summary>
         public string PurchaseMessage { get; protected set; }
 
-        /// <summary>ChannelBitsEvent model constructor.</summary>
+        /// <summary>ChannelBitsEvents model constructor.</summary>
         public ChannelCommerceEvents(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);

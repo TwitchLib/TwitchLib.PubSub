@@ -25,7 +25,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>Context related to event.</summary>
         public string Context { get; protected set; }
 
-        /// <summary>ChannelBitsEvent model constructor.</summary>
+        /// <summary>ChannelBitsEvents model constructor.</summary>
         public ChannelBitsEvents(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);

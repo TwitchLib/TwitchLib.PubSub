@@ -4,8 +4,8 @@ using System;
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <inheritdoc />
-    /// <summary>ChatModeratorActions model.</summary>
-    public class  ChannelSubscription: MessageData
+    /// <summary>ChannelSubscription model.</summary>
+    public class ChannelSubscription : MessageData
     {
         public string Username { get; protected set; }
         public string DisplayName { get; protected set; }

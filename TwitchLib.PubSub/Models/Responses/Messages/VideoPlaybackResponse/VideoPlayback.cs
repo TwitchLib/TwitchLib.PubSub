@@ -33,6 +33,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Type = VideoPlaybackType.ViewCount;
                     break;
             }
+
             ServerTime = json.SelectToken("server_time")?.ToString();
             switch (Type)
             {
