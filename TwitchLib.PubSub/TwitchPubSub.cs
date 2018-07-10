@@ -179,7 +179,7 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "chat_moderator_actions":
-                            var cma = msg.MessageData as ChatModeratorAction;
+                            var cma = msg.MessageData as ChatModeratorActions;
                             var reason = "";
                             switch (cma?.ModerationAction.ToLower())
                             {
@@ -235,7 +235,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "channel-bits-events-v1":
-                            if (msg.MessageData is ChannelBits cbe)
+                            if (msg.MessageData is ChannelBitsEvents cbe)
                                 OnBitsReceived?.Invoke(this, new OnBitsReceivedArgs
                                 {
                                     BitsUsed = cbe.BitsUsed,
@@ -250,7 +250,7 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-commerce-events-v1":
-                            if (msg.MessageData is ChannelCommerce cce)
+                            if (msg.MessageData is ChannelCommerceEvents cce)
                                 OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
                                 {
 
@@ -286,7 +286,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "following":
-                            var f = msg.MessageData as Follow;
+                            var f = msg.MessageData as Following;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             break;
