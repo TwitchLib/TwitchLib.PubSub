@@ -3,29 +3,27 @@ using System.Linq;
 using System.Timers;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using WebSocket4Net;
-using SuperSocket.ClientEngine;
 using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Models.Responses.Messages;
 using TwitchLib.PubSub.Enums;
 using TwitchLib.PubSub.Models;
-using System.Net;
-using SuperSocket.ClientEngine.Proxy;
 using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
+using TwitchLib.Communication;
+using TwitchLib.Communication.Models;
 
 namespace TwitchLib.PubSub
 {
     /// <summary>Class represneting interactions with the Twitch PubSub</summary>
     public class TwitchPubSub : ITwitchPubSub
     {
-        private readonly WebSocket _socket;
+        private readonly WebSocketClient _socket;
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
         private readonly ILogger<TwitchPubSub> _logger;
         private readonly Timer _pingTimer = new Timer();
         private readonly List<string> _topicList = new List<string>();
 
-        #region Events
+#region Events
         /// <summary>Fires when PubSub Service is connected.</summary>
         public event EventHandler OnPubSubServiceConnected;
         /// <summary>Fires when PubSub Service has an error.</summary>
@@ -82,27 +80,26 @@ namespace TwitchLib.PubSub
         /// Constructor for a client that interface's with Twitch's PubSub system.
         /// </summary>
         /// <param name="logger">Optional ILogger param to enable logging</param>
-        /// <param name="proxy">Optional IPEndpoint param to enable proxy support</param>
-        public TwitchPubSub(ILogger<TwitchPubSub> logger = null, EndPoint proxy = null)
+        public TwitchPubSub(ILogger<TwitchPubSub> logger = null)
         {
             _logger = logger;
-            _socket = new WebSocket("wss://pubsub-edge.twitch.tv");
-            _socket.Opened += Socket_OnConnected;
-            _socket.Error += OnError;
-            _socket.MessageReceived += OnMessage;
-            _socket.Closed += Socket_OnDisconnected;
 
-            if (proxy != null)
-                _socket.Proxy = new HttpConnectProxy(proxy);
+            var options = new ClientOptions() { ClientType = Communication.Enums.ClientType.PubSub };
+            _socket = new WebSocketClient(options);
+
+            _socket.OnConnected += Socket_OnConnected;
+            _socket.OnError += OnError;
+            _socket.OnMessage += OnMessage; ;
+            _socket.OnDisconnected += Socket_OnDisconnected;
         }
 
-        private void OnError(object sender, ErrorEventArgs e)
+        private void OnError(object sender, Communication.Events.OnErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
-        private void OnMessage(object sender, MessageReceivedEventArgs e)
+        private void OnMessage(object sender, Communication.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
             ParseMessage(e.Message);
@@ -334,7 +331,7 @@ namespace TwitchLib.PubSub
             _logger?.LogInformation($"[TwitchPubSub] {message}");
         }
 
-        #region Listeners
+#region Listeners
         /// <summary>
         /// Sends a request to listenOn follows coming into a specified channel.
         /// </summary>
@@ -376,10 +373,10 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends request to listenOn channel commerce events in specific channel
         /// </summary>
-        /// <param name="channelName">Name of channel to listen to commerce events in.</param>
-        public void ListenToCommerce(string channelName)
+        /// <param name="channelTwitchId">Channel Id of channel to listen to commerce events on.</param>
+        public void ListenToCommerce(string channelTwitchId)
         {
-            ListenToTopic($"channel-commerce-events-v1.{channelName}");
+            ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
         }
         
         /// <summary>
@@ -408,7 +405,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-subscribe-events-v1.{channelId}");
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Method to connect to Twitch's PubSub service. You MUST listen toOnConnected event and listen to a Topic within 15 seconds of connecting (or be disconnected)
