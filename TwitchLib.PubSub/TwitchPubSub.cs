@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
 using TwitchLib.Communication.Models;
+using TwitchLib.Communication.Clients;
 
 namespace TwitchLib.PubSub
 {
