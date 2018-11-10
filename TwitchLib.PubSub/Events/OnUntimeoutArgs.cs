@@ -4,6 +4,8 @@
     public class OnUntimeoutArgs
     {
         /// <summary>User that was untimed out (ie unbanned for a timeout)</summary>
+        public string UntimeoutedUser;
+        /// <summary>Userid that was untimed out (ie unbanned for a timeout)</summary>
         public string UntimeoutedUserId;
         /// <summary>Moderator that issued the untimeout command.</summary>
         public string UntimeoutedBy;
