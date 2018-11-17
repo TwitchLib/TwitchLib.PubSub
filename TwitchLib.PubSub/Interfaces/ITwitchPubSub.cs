@@ -27,6 +27,7 @@ namespace TwitchLib.PubSub.Interfaces
         event EventHandler<OnUntimeoutArgs> OnUntimeout;
         event EventHandler<OnViewCountArgs> OnViewCount;
         event EventHandler<OnWhisperArgs> OnWhisper;
+        event EventHandler<OnLogArgs> OnLog;
 
         void Connect();
         void Disconnect();

@@ -74,6 +74,8 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
         /// <summary>Fires when PubSub receives notice when a user follows the designated channel.</summary>
         public event EventHandler<OnFollowArgs> OnFollow;
+        /// <summary>Fires when PubSub receives any data from Twitch</summary>
+        public event EventHandler<OnLogArgs> OnLog;
         #endregion
 
         /// <summary>
@@ -102,6 +104,7 @@ namespace TwitchLib.PubSub
         private void OnMessage(object sender, Communication.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
+            OnLog?.Invoke(this, new OnLogArgs { Data = e.Message });
             ParseMessage(e.Message);
         }
 
