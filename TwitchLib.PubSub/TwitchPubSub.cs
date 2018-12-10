@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
 using TwitchLib.Communication.Models;
-using TwitchLib.Communication.Clients;
 
 namespace TwitchLib.PubSub
 {
@@ -75,6 +74,8 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
         /// <summary>Fires when PubSub receives notice when a user follows the designated channel.</summary>
         public event EventHandler<OnFollowArgs> OnFollow;
+        /// <summary>Fires when PubSub receives any data from Twitch</summary>
+        public event EventHandler<OnLogArgs> OnLog;
         #endregion
 
         /// <summary>
@@ -103,6 +104,7 @@ namespace TwitchLib.PubSub
         private void OnMessage(object sender, Communication.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
+            OnLog?.Invoke(this, new OnLogArgs { Data = e.Message });
             ParseMessage(e.Message);
         }
 
@@ -186,10 +188,10 @@ namespace TwitchLib.PubSub
                                     OnBan?.Invoke(this, new OnBanArgs { BannedBy = cma.CreatedBy, BannedByUserId = cma.CreatedByUserId, BannedUserId = cma.TargetUserId, BanReason = reason, BannedUser = cma.Args[0] });
                                     return;
                                 case "unban":
-                                    OnUnban?.Invoke(this, new OnUnbanArgs { UnbannedBy = cma.CreatedBy, UnbannedByUserId = cma.CreatedByUserId, UnbannedUserId = cma.TargetUserId });
+                                    OnUnban?.Invoke(this, new OnUnbanArgs { UnbannedBy = cma.CreatedBy, UnbannedByUserId = cma.CreatedByUserId, UnbannedUserId = cma.TargetUserId, UnbannedUser = cma.Args[0] });
                                     return;
                                 case "untimeout":
-                                    OnUntimeout?.Invoke(this, new OnUntimeoutArgs { UntimeoutedBy = cma.CreatedBy, UntimeoutedByUserId = cma.CreatedByUserId, UntimeoutedUserId = cma.TargetUserId });
+                                    OnUntimeout?.Invoke(this, new OnUntimeoutArgs { UntimeoutedBy = cma.CreatedBy, UntimeoutedByUserId = cma.CreatedByUserId, UntimeoutedUserId = cma.TargetUserId, UntimeoutedUser = cma.Args[0] });
                                     return;
                                 case "host":
                                     OnHost?.Invoke(this, new OnHostArgs { HostedChannel = cma.Args[0], Moderator = cma.CreatedBy });
