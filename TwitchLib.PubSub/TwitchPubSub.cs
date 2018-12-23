@@ -36,6 +36,8 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnTimeoutArgs> OnTimeout;
         /// <summary>Fires when PubSub receives notice a viewer gets banned.</summary>
         public event EventHandler<OnBanArgs> OnBan;
+        /// <summary>Fires when PubSub receives notice a message was deleted.</summary>
+        public event EventHandler<OnMessageDeletedArgs> OnMessageDeleted;
         /// <summary>Fires when PubSub receives notice a viewer gets unbanned.</summary>
         public event EventHandler<OnUnbanArgs> OnUnban;
         /// <summary>Fires when PubSub receives notice a viewer gets a timeout removed.</summary>
@@ -186,6 +188,9 @@ namespace TwitchLib.PubSub
                                     if (cma.Args.Count > 1)
                                         reason = cma.Args[1];
                                     OnBan?.Invoke(this, new OnBanArgs { BannedBy = cma.CreatedBy, BannedByUserId = cma.CreatedByUserId, BannedUserId = cma.TargetUserId, BanReason = reason, BannedUser = cma.Args[0] });
+                                    return;
+                                case "delete":
+                                    OnMessageDeleted?.Invoke(this, new OnMessageDeletedArgs { DeletedBy = cma.CreatedBy, DeletedByUserId = cma.CreatedByUserId, TargetUserId = cma.TargetUserId, TargetUser = cma.Args[0], Message = cma.Args[1], MessageId = cma.Args[2] });
                                     return;
                                 case "unban":
                                     OnUnban?.Invoke(this, new OnUnbanArgs { UnbannedBy = cma.CreatedBy, UnbannedByUserId = cma.CreatedByUserId, UnbannedUserId = cma.TargetUserId, UnbannedUser = cma.Args[0] });
