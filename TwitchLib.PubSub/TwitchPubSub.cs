@@ -1,82 +1,155 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
-using TwitchLib.PubSub.Events;
-using TwitchLib.PubSub.Models.Responses.Messages;
-using TwitchLib.PubSub.Enums;
-using TwitchLib.PubSub.Models;
-using Microsoft.Extensions.Logging;
-using TwitchLib.PubSub.Interfaces;
-using TwitchLib.Communication;
+using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub.Enums;
+using TwitchLib.PubSub.Events;
+using TwitchLib.PubSub.Interfaces;
+using TwitchLib.PubSub.Models;
+using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub
 {
-    /// <summary>Class represneting interactions with the Twitch PubSub</summary>
+    /// <summary>
+    /// Class represneting interactions with the Twitch PubSub
+    /// Implements the <see cref="TwitchLib.PubSub.Interfaces.ITwitchPubSub" />
+    /// </summary>
+    /// <seealso cref="TwitchLib.PubSub.Interfaces.ITwitchPubSub" />
     public class TwitchPubSub : ITwitchPubSub
     {
+        /// <summary>
+        /// The socket
+        /// </summary>
         private readonly WebSocketClient _socket;
+        /// <summary>
+        /// The previous requests
+        /// </summary>
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
+        /// <summary>
+        /// The logger
+        /// </summary>
         private readonly ILogger<TwitchPubSub> _logger;
+        /// <summary>
+        /// The ping timer
+        /// </summary>
         private readonly Timer _pingTimer = new Timer();
+        /// <summary>
+        /// The topic list
+        /// </summary>
         private readonly List<string> _topicList = new List<string>();
 
-#region Events
-        /// <summary>Fires when PubSub Service is connected.</summary>
+        #region Events
+        /// <summary>
+        /// Fires when PubSub Service is connected.
+        /// </summary>
         public event EventHandler OnPubSubServiceConnected;
-        /// <summary>Fires when PubSub Service has an error.</summary>
+        /// <summary>
+        /// Fires when PubSub Service has an error.
+        /// </summary>
         public event EventHandler<OnPubSubServiceErrorArgs> OnPubSubServiceError;
-        /// <summary>Fires when PubSub Service is closed.</summary>
+        /// <summary>
+        /// Fires when PubSub Service is closed.
+        /// </summary>
         public event EventHandler OnPubSubServiceClosed;
-        /// <summary>Fires when PubSub receives any response.</summary>
+        /// <summary>
+        /// Fires when PubSub receives any response.
+        /// </summary>
         public event EventHandler<OnListenResponseArgs> OnListenResponse;
-        /// <summary>Fires when PubSub receives notice a viewer gets a timeout.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice a viewer gets a timeout.
+        /// </summary>
         public event EventHandler<OnTimeoutArgs> OnTimeout;
-        /// <summary>Fires when PubSub receives notice a viewer gets banned.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice a viewer gets banned.
+        /// </summary>
         public event EventHandler<OnBanArgs> OnBan;
-        /// <summary>Fires when PubSub receives notice a message was deleted.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice a message was deleted.
+        /// </summary>
         public event EventHandler<OnMessageDeletedArgs> OnMessageDeleted;
-        /// <summary>Fires when PubSub receives notice a viewer gets unbanned.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice a viewer gets unbanned.
+        /// </summary>
         public event EventHandler<OnUnbanArgs> OnUnban;
-        /// <summary>Fires when PubSub receives notice a viewer gets a timeout removed.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice a viewer gets a timeout removed.
+        /// </summary>
         public event EventHandler<OnUntimeoutArgs> OnUntimeout;
-        /// <summary>Fires when PubSub receives notice that the channel being listened to is hosting another channel.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that the channel being listened to is hosting another channel.
+        /// </summary>
         public event EventHandler<OnHostArgs> OnHost;
-        /// <summary>Fires when PubSub receives notice that Sub-Only Mode gets turned on.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that Sub-Only Mode gets turned on.
+        /// </summary>
         public event EventHandler<OnSubscribersOnlyArgs> OnSubscribersOnly;
-        /// <summary>Fires when PubSub receives notice that Sub-Only Mode gets turned off.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that Sub-Only Mode gets turned off.
+        /// </summary>
         public event EventHandler<OnSubscribersOnlyOffArgs> OnSubscribersOnlyOff;
-        /// <summary>Fires when PubSub receives notice that chat gets cleared.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that chat gets cleared.
+        /// </summary>
         public event EventHandler<OnClearArgs> OnClear;
-        /// <summary>Fires when PubSub receives notice that Emote-Only Mode gets turned on.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that Emote-Only Mode gets turned on.
+        /// </summary>
         public event EventHandler<OnEmoteOnlyArgs> OnEmoteOnly;
-        /// <summary>Fires when PubSub receives notice that Emote-Only Mode gets turned off.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that Emote-Only Mode gets turned off.
+        /// </summary>
         public event EventHandler<OnEmoteOnlyOffArgs> OnEmoteOnlyOff;
-        /// <summary>Fires when PubSub receives notice that the chat option R9kBeta gets turned on.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that the chat option R9kBeta gets turned on.
+        /// </summary>
         public event EventHandler<OnR9kBetaArgs> OnR9kBeta;
-        /// <summary>Fires when PubSub receives notice that the chat option R9kBeta gets turned off.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that the chat option R9kBeta gets turned off.
+        /// </summary>
         public event EventHandler<OnR9kBetaOffArgs> OnR9kBetaOff;
-        /// <summary>Fires when PubSub receives notice of a bit donation.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice of a bit donation.
+        /// </summary>
         public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
-        /// <summary>Fires when PubSub receives notice of a commerce transaction.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice of a commerce transaction.
+        /// </summary>
         public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
-        /// <summary>Fires when PubSub receives notice that the stream of the channel being listened to goes online.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that the stream of the channel being listened to goes online.
+        /// </summary>
         public event EventHandler<OnStreamUpArgs> OnStreamUp;
-        /// <summary>Fires when PubSub receives notice that the stream of the channel being listened to goes offline.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice that the stream of the channel being listened to goes offline.
+        /// </summary>
         public event EventHandler<OnStreamDownArgs> OnStreamDown;
-        /// <summary>Fires when PubSub receives notice view count has changed.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice view count has changed.
+        /// </summary>
         public event EventHandler<OnViewCountArgs> OnViewCount;
-        /// <summary>Fires when PubSub receives a whisper.</summary>
+        /// <summary>
+        /// Fires when PubSub receives a whisper.
+        /// </summary>
         public event EventHandler<OnWhisperArgs> OnWhisper;
-        /// <summary>Fires when PubSub receives notice when the channel being listened to gets a subscription.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice when the channel being listened to gets a subscription.
+        /// </summary>
         public event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
-        /// <summary>Fires when PubSub receives a message sent to the specified extension on the specified channel.</summary>
+        /// <summary>
+        /// Fires when PubSub receives a message sent to the specified extension on the specified channel.
+        /// </summary>
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
-        /// <summary>Fires when PubSub receives notice when a user follows the designated channel.</summary>
+        /// <summary>
+        /// Fires when PubSub receives notice when a user follows the designated channel.
+        /// </summary>
         public event EventHandler<OnFollowArgs> OnFollow;
-        /// <summary>Fires when PubSub receives any data from Twitch</summary>
+        /// <summary>
+        /// Fires when PubSub receives any data from Twitch
+        /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
         #endregion
 
@@ -88,7 +161,7 @@ namespace TwitchLib.PubSub
         {
             _logger = logger;
 
-            var options = new ClientOptions() { ClientType = Communication.Enums.ClientType.PubSub };
+            ClientOptions options = new ClientOptions() { ClientType = Communication.Enums.ClientType.PubSub };
             _socket = new WebSocketClient(options);
 
             _socket.OnConnected += Socket_OnConnected;
@@ -97,12 +170,22 @@ namespace TwitchLib.PubSub
             _socket.OnDisconnected += Socket_OnDisconnected;
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:Error" /> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Communication.Events.OnErrorEventArgs"/> instance containing the event data.</param>
         private void OnError(object sender, Communication.Events.OnErrorEventArgs e)
         {
             _logger?.LogError($"Error in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
         }
 
+        /// <summary>
+        /// Handles the <see cref="E:Message" /> event.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="Communication.Events.OnMessageEventArgs"/> instance containing the event data.</param>
         private void OnMessage(object sender, Communication.Events.OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket Message: {e.Message}");
@@ -110,6 +193,11 @@ namespace TwitchLib.PubSub
             ParseMessage(e.Message);
         }
 
+        /// <summary>
+        /// Handles the OnDisconnected event of the Socket control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Socket_OnDisconnected(object sender, EventArgs e)
         {
             _logger?.LogWarning("PubSub Websocket connection closed");
@@ -117,6 +205,11 @@ namespace TwitchLib.PubSub
             OnPubSubServiceClosed?.Invoke(this, null);
         }
 
+        /// <summary>
+        /// Handles the OnConnected event of the Socket control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Socket_OnConnected(object sender, EventArgs e)
         {
             _logger?.LogInformation("PubSub Websocket connection established");
@@ -126,25 +219,34 @@ namespace TwitchLib.PubSub
             OnPubSubServiceConnected?.Invoke(this, null);
         }
 
+        /// <summary>
+        /// Pings the timer tick.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
         private void PingTimerTick(object sender, ElapsedEventArgs e)
         {
-            var data = new JObject(
+            JObject data = new JObject(
                 new JProperty("type", "PING")
             );
             _socket.Send(data.ToString());
         }
 
+        /// <summary>
+        /// Parses the message.
+        /// </summary>
+        /// <param name="message">The message.</param>
         private void ParseMessage(string message)
         {
-            var type = JObject.Parse(message).SelectToken("type")?.ToString();
+            string type = JObject.Parse(message).SelectToken("type")?.ToString();
 
             switch (type?.ToLower())
             {
                 case "response":
-                    var resp = new Models.Responses.Response(message);
+                    Models.Responses.Response resp = new Models.Responses.Response(message);
                     if (_previousRequests.Count != 0)
                     {
-                        foreach (var request in _previousRequests)
+                        foreach (PreviousRequest request in _previousRequests)
                         {
                             if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
                             {
@@ -155,20 +257,20 @@ namespace TwitchLib.PubSub
                     }
                     break;
                 case "message":
-                    var msg = new Models.Responses.Message(message);
+                    Models.Responses.Message msg = new Models.Responses.Message(message);
                     switch (msg.Topic.Split('.')[0])
                     {
                         case "channel-subscribe-events-v1":
-                            var subscription = msg.MessageData as ChannelSubscription;
+                            ChannelSubscription subscription = msg.MessageData as ChannelSubscription;
                             OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription });
                             return;
                         case "whispers":
-                            var whisper = (Whisper)msg.MessageData;
+                            Whisper whisper = (Whisper)msg.MessageData;
                             OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper });
                             return;
                         case "chat_moderator_actions":
-                            var cma = msg.MessageData as ChatModeratorActions;
-                            var reason = "";
+                            ChatModeratorActions cma = msg.MessageData as ChatModeratorActions;
+                            string reason = "";
                             switch (cma?.ModerationAction.ToLower())
                             {
                                 case "timeout":
@@ -258,11 +360,11 @@ namespace TwitchLib.PubSub
                                 });
                             return;
                         case "channel-ext-v1":
-                            var cEB = msg.MessageData as ChannelExtensionBroadcast;
+                            ChannelExtensionBroadcast cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages });
                             break;
                         case "video-playback":
-                            var vP = msg.MessageData as VideoPlayback;
+                            VideoPlayback vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
@@ -277,7 +379,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "following":
-                            var f = msg.MessageData as Following;
+                            Following f = msg.MessageData as Following;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             break;
@@ -287,18 +389,34 @@ namespace TwitchLib.PubSub
             UnaccountedFor(message);
         }
 
+        /// <summary>
+        /// The random
+        /// </summary>
         private static readonly Random Random = new Random();
+        /// <summary>
+        /// Generates the nonce.
+        /// </summary>
+        /// <returns>System.String.</returns>
         private static string GenerateNonce()
         {
             return new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
 
+        /// <summary>
+        /// Listens to topic.
+        /// </summary>
+        /// <param name="topic">The topic.</param>
         private void ListenToTopic(string topic)
         {
             _topicList.Add(topic);
         }
 
+        /// <summary>
+        /// Sends the topics.
+        /// </summary>
+        /// <param name="oauth">The oauth.</param>
+        /// <param name="unlisten">if set to <c>true</c> [unlisten].</param>
         public void SendTopics(string oauth = null, bool unlisten = false)
         {
             if (oauth != null && oauth.Contains("oauth:"))
@@ -306,16 +424,16 @@ namespace TwitchLib.PubSub
                 oauth = oauth.Replace("oauth:", "");
             }
 
-            var nonce = GenerateNonce();
+            string nonce = GenerateNonce();
 
-            var topics = new JArray();
-            foreach (var val in _topicList)
+            JArray topics = new JArray();
+            foreach (string val in _topicList)
             {
                 _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
                 topics.Add(new JValue(val));
             }
 
-            var jsonData = new JObject(
+            JObject jsonData = new JObject(
                 new JProperty("type", !unlisten ? "LISTEN" : "UNLISTEN"),
                 new JProperty("nonce", nonce),
                 new JProperty("data",
@@ -334,16 +452,20 @@ namespace TwitchLib.PubSub
             _topicList.Clear();
         }
 
+        /// <summary>
+        /// Unaccounteds for.
+        /// </summary>
+        /// <param name="message">The message.</param>
         private void UnaccountedFor(string message)
         {
             _logger?.LogInformation($"[TwitchPubSub] {message}");
         }
 
-#region Listeners
+        #region Listeners
         /// <summary>
         /// Sends a request to listenOn follows coming into a specified channel.
         /// </summary>
-        /// <param name="channelTwitchId">Channel ID to watch for new followers on.</param>
+        /// <param name="channelId">The channel identifier.</param>
         public void ListenToFollows(string channelId)
         {
             ListenToTopic($"following.{channelId}");
@@ -363,7 +485,7 @@ namespace TwitchLib.PubSub
         /// Sends a request to ListenOn EBS broadcasts sent to a specific extension on a specific channel.
         /// </summary>
         /// <param name="channelId">Id of the channel that the extension lives on.</param>
-        /// <param name="extensionId"></param>
+        /// <param name="extensionId">The extension identifier.</param>
         public void ListenToChannelExtensionBroadcast(string channelId, string extensionId)
         {
             ListenToTopic($"channel-ext-v1.{channelId}-{extensionId}-broadcast");
@@ -386,7 +508,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
         }
-        
+
         /// <summary>
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
@@ -413,7 +535,7 @@ namespace TwitchLib.PubSub
         {
             ListenToTopic($"channel-subscribe-events-v1.{channelId}");
         }
-#endregion
+        #endregion
 
         /// <summary>
         /// Method to connect to Twitch's PubSub service. You MUST listen toOnConnected event and listen to a Topic within 15 seconds of connecting (or be disconnected)
@@ -434,7 +556,7 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// This method will send passed json text to the message parser in order to allow forOn-demand parser testing.
         /// </summary>
-        /// <param name="testJsonString"></param>
+        /// <param name="testJsonString">The test json string.</param>
         public void TestMessageParser(string testJsonString)
         {
             ParseMessage(testJsonString);

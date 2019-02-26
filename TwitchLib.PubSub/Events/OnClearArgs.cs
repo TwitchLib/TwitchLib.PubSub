@@ -1,9 +1,13 @@
 ﻿namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Class representing arguments of chat clear event.</summary>
+    /// <summary>
+    /// Class representing arguments of chat clear event.
+    /// </summary>
     public class OnClearArgs
     {
-        /// <summary>Property representing username of moderator who cleared chat.</summary>
+        /// <summary>
+        /// Property representing username of moderator who cleared chat.
+        /// </summary>
         public string Moderator;
     }
 }

@@ -1,24 +1,38 @@
 ﻿namespace TwitchLib.PubSub.Events
 {
-    /// <summary>OnMessageDeleted event arguments class.</summary>
+    /// <summary>
+    /// OnMessageDeleted event arguments class.
+    /// </summary>
     public class OnMessageDeletedArgs
     {
-        /// <summary>Name of the user whose message was deleted</summary>
+        /// <summary>
+        /// Name of the user whose message was deleted
+        /// </summary>
         public string TargetUser;
 
-        /// <summary>ID of the user whose message was deleted</summary>
+        /// <summary>
+        /// ID of the user whose message was deleted
+        /// </summary>
         public string TargetUserId;
 
-        /// <summary>Name of the moderator who deleted the message</summary>
+        /// <summary>
+        /// Name of the moderator who deleted the message
+        /// </summary>
         public string DeletedBy;
 
-        /// <summary>ID of the moderator who deleted the message</summary>
+        /// <summary>
+        /// ID of the moderator who deleted the message
+        /// </summary>
         public string DeletedByUserId;
 
-        /// <summary>The message that was deleted</summary>
+        /// <summary>
+        /// The message that was deleted
+        /// </summary>
         public string Message;
 
-        /// <summary>ID of the message that was deleted</summary>
+        /// <summary>
+        /// ID of the message that was deleted
+        /// </summary>
         public string MessageId;
     }
 }
