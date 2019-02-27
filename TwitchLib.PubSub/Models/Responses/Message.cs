@@ -3,20 +3,30 @@ using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Models.Responses
 {
-    /// <summary>PubSub Message model.</summary>
+    /// <summary>
+    /// PubSub Message model.
+    /// </summary>
     public class Message
     {
-        /// <summary>Topic that the message is relevant to.</summary>
+        /// <summary>
+        /// Topic that the message is relevant to.
+        /// </summary>
+        /// <value>The topic.</value>
         public string Topic { get; protected set; }
-        /// <summary>Model containing data of the message.</summary>
+        /// <summary>
+        /// Model containing data of the message.
+        /// </summary>
         public readonly MessageData MessageData;
 
-        /// <summary>PubSub Message model constructor.</summary>
+        /// <summary>
+        /// PubSub Message model constructor.
+        /// </summary>
+        /// <param name="jsonStr">The json string.</param>
         public Message(string jsonStr)
         {
-            var json = JObject.Parse(jsonStr).SelectToken("data");
+            JToken json = JObject.Parse(jsonStr).SelectToken("data");
             Topic = json.SelectToken("topic")?.ToString();
-            var encodedJsonMessage = json.SelectToken("message").ToString();
+            string encodedJsonMessage = json.SelectToken("message").ToString();
             switch (Topic?.Split('.')[0])
             {
                 case "chat_moderator_actions":

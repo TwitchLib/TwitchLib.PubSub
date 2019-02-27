@@ -2,17 +2,33 @@
 
 namespace TwitchLib.PubSub.Models
 {
-    /// <summary>Model representing the previous request.</summary>
+    /// <summary>
+    /// Model representing the previous request.
+    /// </summary>
     public class PreviousRequest
     {
-        /// <summary>Unique communication token.</summary>
+        /// <summary>
+        /// Unique communication token.
+        /// </summary>
+        /// <value>The nonce.</value>
         public string Nonce { get; protected set; }
-        /// <summary>PubSub request type.</summary>
+        /// <summary>
+        /// PubSub request type.
+        /// </summary>
+        /// <value>The type of the request.</value>
         public PubSubRequestType RequestType { get; protected set; }
-        /// <summary>Topic that we are interested in.</summary>
+        /// <summary>
+        /// Topic that we are interested in.
+        /// </summary>
+        /// <value>The topic.</value>
         public string Topic { get; protected set; }
 
-        /// <summary>PreviousRequest model constructor.</summary>
+        /// <summary>
+        /// PreviousRequest model constructor.
+        /// </summary>
+        /// <param name="nonce">The nonce.</param>
+        /// <param name="requestType">Type of the request.</param>
+        /// <param name="topic">The topic.</param>
         public PreviousRequest(string nonce, PubSubRequestType requestType, string topic = "none set")
         {
             Nonce = nonce;

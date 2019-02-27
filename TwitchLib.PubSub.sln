@@ -5,13 +5,7 @@ VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.PubSub", "TwitchLib.PubSub\TwitchLib.PubSub.csproj", "{BF806D39-66B7-41CF-9406-5383B22D5677}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Communication", "TwitchLib.Communication\src\TwitchLib.Communication\TwitchLib.Communication.csproj", "{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3652D8CC-0543-4709-AF5B-5F9B7EC669B3}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{632D1EED-94F2-4E49-A857-8EAA8D7E0966}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TwitchLib.Communication.Tests", "TwitchLib.Communication\src\TwitchLib.Communication.Tests\TwitchLib.Communication.Tests.csproj", "{89A033E5-ECBE-42E6-9A53-E899887EBC1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,22 +17,12 @@ Global
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BF806D39-66B7-41CF-9406-5383B22D5677}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{89A033E5-ECBE-42E6-9A53-E899887EBC1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{89A033E5-ECBE-42E6-9A53-E899887EBC1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{89A033E5-ECBE-42E6-9A53-E899887EBC1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{89A033E5-ECBE-42E6-9A53-E899887EBC1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BF806D39-66B7-41CF-9406-5383B22D5677} = {3652D8CC-0543-4709-AF5B-5F9B7EC669B3}
-		{2370B22E-3A25-4E44-A6B9-B8614FD1C82D} = {3652D8CC-0543-4709-AF5B-5F9B7EC669B3}
-		{89A033E5-ECBE-42E6-9A53-E899887EBC1E} = {632D1EED-94F2-4E49-A857-8EAA8D7E0966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6F2493A-B630-4DE7-A5BD-D876F7A39165}

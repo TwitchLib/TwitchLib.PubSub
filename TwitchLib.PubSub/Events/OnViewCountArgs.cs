@@ -1,11 +1,17 @@
 ﻿namespace TwitchLib.PubSub.Events
 {
-    /// <summary>ViewCount arguments class.</summary>
+    /// <summary>
+    /// ViewCount arguments class.
+    /// </summary>
     public class OnViewCountArgs
     {
-        /// <summary>Server time issued by Twitch.</summary>
+        /// <summary>
+        /// Server time issued by Twitch.
+        /// </summary>
         public string ServerTime;
-        /// <summary>Number of viewers at current time.</summary>
+        /// <summary>
+        /// Number of viewers at current time.
+        /// </summary>
         public int Viewers;
     }
 }

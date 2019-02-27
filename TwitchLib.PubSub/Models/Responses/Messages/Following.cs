@@ -1,24 +1,40 @@
 ﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
+    /// <summary>
+    /// Following model constructor.
+    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// </summary>
+    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
     /// <inheritdoc />
-    /// <summary>Following model constructor.</summary>
     public class Following : MessageData
     {
-        /// <summary>Following user display name.</summary>
+        /// <summary>
+        /// Following user display name.
+        /// </summary>
+        /// <value>The display name.</value>
         public string DisplayName { get; protected set; }
-        /// <summary>Following user username.</summary>
+        /// <summary>
+        /// Following user username.
+        /// </summary>
+        /// <value>The username.</value>
         public string Username { get; protected set; }
-        /// <summary>Following user user-id.</summary>
+        /// <summary>
+        /// Following user user-id.
+        /// </summary>
+        /// <value>The user identifier.</value>
         public string UserId { get; protected set; }
+        /// <summary>
+        /// Gets the followed channel identifier.
+        /// </summary>
+        /// <value>The followed channel identifier.</value>
         public string FollowedChannelId { get; internal set; }
 
-        /// <summary>Following constructor.</summary>
-        /// <param name="jsonStr"></param>
+        /// <summary>
+        /// Following constructor.
+        /// </summary>
+        /// <param name="jsonStr">The json string.</param>
         public Following(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
