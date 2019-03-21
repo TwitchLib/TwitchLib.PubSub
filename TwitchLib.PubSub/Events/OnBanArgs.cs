@@ -25,5 +25,10 @@
         /// Property representing the user id of the moderator that banned the user.
         /// </summary>
         public string BannedByUserId;
+
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

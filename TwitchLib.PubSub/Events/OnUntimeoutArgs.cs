@@ -21,5 +21,9 @@
         /// Moderator user id that issued untimeout command.
         /// </summary>
         public string UntimeoutedByUserId;
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

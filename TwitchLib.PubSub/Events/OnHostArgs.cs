@@ -13,5 +13,9 @@
         /// Property representing hosted channel.
         /// </summary>
         public string HostedChannel;
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

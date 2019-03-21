@@ -9,5 +9,9 @@
         /// Property representing the moderator that issued the command.
         /// </summary>
         public string Moderator;
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

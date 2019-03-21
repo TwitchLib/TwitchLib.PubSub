@@ -21,5 +21,9 @@
         /// Userid of the unbanned user.
         /// </summary>
         public string UnbannedByUserId;
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

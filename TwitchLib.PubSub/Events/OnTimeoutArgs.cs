@@ -31,5 +31,10 @@ namespace TwitchLib.PubSub.Events
         /// Property representing the moderator that issued the command's user id.
         /// </summary>
         public string TimedoutById;
+
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }
