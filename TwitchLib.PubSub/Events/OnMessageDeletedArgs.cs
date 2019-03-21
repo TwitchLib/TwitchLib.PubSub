@@ -34,5 +34,10 @@
         /// ID of the message that was deleted
         /// </summary>
         public string MessageId;
+
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }

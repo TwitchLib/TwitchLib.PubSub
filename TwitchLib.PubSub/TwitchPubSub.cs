@@ -42,6 +42,8 @@ namespace TwitchLib.PubSub
         /// </summary>
         private readonly List<string> _topicList = new List<string>();
 
+        private Dictionary<string, string> _topicToChannelId = new Dictionary<string, string>();
+
         #region Events
         /// <summary>
         /// Fires when PubSub Service is connected.
@@ -250,6 +252,7 @@ namespace TwitchLib.PubSub
                         {
                             if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
                             {
+                                Console.WriteLine(request.Topic);
                                 OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
                             }
                         }
@@ -258,19 +261,21 @@ namespace TwitchLib.PubSub
                     break;
                 case "message":
                     Models.Responses.Message msg = new Models.Responses.Message(message);
+                    string channelId = _topicToChannelId[msg.Topic] ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
                         case "channel-subscribe-events-v1":
                             ChannelSubscription subscription = msg.MessageData as ChannelSubscription;
-                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription });
+                            OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription, ChannelId = channelId });
                             return;
                         case "whispers":
                             Whisper whisper = (Whisper)msg.MessageData;
-                            OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper });
+                            OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper, ChannelId = channelId });
                             return;
                         case "chat_moderator_actions":
                             ChatModeratorActions cma = msg.MessageData as ChatModeratorActions;
                             string reason = "";
+                            string targetChannelId = msg.Topic.Split('.')[2];
                             switch (cma?.ModerationAction.ToLower())
                             {
                                 case "timeout":
@@ -283,46 +288,47 @@ namespace TwitchLib.PubSub
                                         TimedoutUserId = cma.TargetUserId,
                                         TimeoutDuration = TimeSpan.FromSeconds(int.Parse(cma.Args[1])),
                                         TimeoutReason = reason,
-                                        TimedoutUser = cma.Args[0]
+                                        TimedoutUser = cma.Args[0],
+                                        ChannelId = channelId
                                     });
                                     return;
                                 case "ban":
                                     if (cma.Args.Count > 1)
                                         reason = cma.Args[1];
-                                    OnBan?.Invoke(this, new OnBanArgs { BannedBy = cma.CreatedBy, BannedByUserId = cma.CreatedByUserId, BannedUserId = cma.TargetUserId, BanReason = reason, BannedUser = cma.Args[0] });
+                                    OnBan?.Invoke(this, new OnBanArgs { BannedBy = cma.CreatedBy, BannedByUserId = cma.CreatedByUserId, BannedUserId = cma.TargetUserId, BanReason = reason, BannedUser = cma.Args[0], ChannelId = channelId });
                                     return;
                                 case "delete":
-                                    OnMessageDeleted?.Invoke(this, new OnMessageDeletedArgs { DeletedBy = cma.CreatedBy, DeletedByUserId = cma.CreatedByUserId, TargetUserId = cma.TargetUserId, TargetUser = cma.Args[0], Message = cma.Args[1], MessageId = cma.Args[2] });
+                                    OnMessageDeleted?.Invoke(this, new OnMessageDeletedArgs { DeletedBy = cma.CreatedBy, DeletedByUserId = cma.CreatedByUserId, TargetUserId = cma.TargetUserId, TargetUser = cma.Args[0], Message = cma.Args[1], MessageId = cma.Args[2], ChannelId = channelId });
                                     return;
                                 case "unban":
-                                    OnUnban?.Invoke(this, new OnUnbanArgs { UnbannedBy = cma.CreatedBy, UnbannedByUserId = cma.CreatedByUserId, UnbannedUserId = cma.TargetUserId, UnbannedUser = cma.Args[0] });
+                                    OnUnban?.Invoke(this, new OnUnbanArgs { UnbannedBy = cma.CreatedBy, UnbannedByUserId = cma.CreatedByUserId, UnbannedUserId = cma.TargetUserId, UnbannedUser = cma.Args[0], ChannelId = channelId });
                                     return;
                                 case "untimeout":
-                                    OnUntimeout?.Invoke(this, new OnUntimeoutArgs { UntimeoutedBy = cma.CreatedBy, UntimeoutedByUserId = cma.CreatedByUserId, UntimeoutedUserId = cma.TargetUserId, UntimeoutedUser = cma.Args[0] });
+                                    OnUntimeout?.Invoke(this, new OnUntimeoutArgs { UntimeoutedBy = cma.CreatedBy, UntimeoutedByUserId = cma.CreatedByUserId, UntimeoutedUserId = cma.TargetUserId, UntimeoutedUser = cma.Args[0], ChannelId = channelId });
                                     return;
                                 case "host":
-                                    OnHost?.Invoke(this, new OnHostArgs { HostedChannel = cma.Args[0], Moderator = cma.CreatedBy });
+                                    OnHost?.Invoke(this, new OnHostArgs { HostedChannel = cma.Args[0], Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "subscribers":
-                                    OnSubscribersOnly?.Invoke(this, new OnSubscribersOnlyArgs { Moderator = cma.CreatedBy });
+                                    OnSubscribersOnly?.Invoke(this, new OnSubscribersOnlyArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "subscribersoff":
-                                    OnSubscribersOnlyOff?.Invoke(this, new OnSubscribersOnlyOffArgs { Moderator = cma.CreatedBy });
+                                    OnSubscribersOnlyOff?.Invoke(this, new OnSubscribersOnlyOffArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "clear":
-                                    OnClear?.Invoke(this, new OnClearArgs { Moderator = cma.CreatedBy });
+                                    OnClear?.Invoke(this, new OnClearArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "emoteonly":
-                                    OnEmoteOnly?.Invoke(this, new OnEmoteOnlyArgs { Moderator = cma.CreatedBy });
+                                    OnEmoteOnly?.Invoke(this, new OnEmoteOnlyArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "emoteonlyoff":
-                                    OnEmoteOnlyOff?.Invoke(this, new OnEmoteOnlyOffArgs { Moderator = cma.CreatedBy });
+                                    OnEmoteOnlyOff?.Invoke(this, new OnEmoteOnlyOffArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "r9kbeta":
-                                    OnR9kBeta?.Invoke(this, new OnR9kBetaArgs { Moderator = cma.CreatedBy });
+                                    OnR9kBeta?.Invoke(this, new OnR9kBetaArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
                                 case "r9kbetaoff":
-                                    OnR9kBetaOff?.Invoke(this, new OnR9kBetaOffArgs { Moderator = cma.CreatedBy });
+                                    OnR9kBetaOff?.Invoke(this, new OnR9kBetaOffArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
 
                             }
@@ -361,7 +367,7 @@ namespace TwitchLib.PubSub
                             return;
                         case "channel-ext-v1":
                             ChannelExtensionBroadcast cEB = msg.MessageData as ChannelExtensionBroadcast;
-                            OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages });
+                            OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
                             break;
                         case "video-playback":
                             VideoPlayback vP = msg.MessageData as VideoPlayback;
@@ -468,7 +474,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelId">The channel identifier.</param>
         public void ListenToFollows(string channelId)
         {
-            ListenToTopic($"following.{channelId}");
+            string topic = $"following.{channelId}";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -478,7 +486,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
         public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
         {
-            ListenToTopic($"chat_moderator_actions.{myTwitchId}.{channelTwitchId}");
+            string topic = $"chat_moderator_actions.{myTwitchId}.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -488,7 +498,9 @@ namespace TwitchLib.PubSub
         /// <param name="extensionId">The extension identifier.</param>
         public void ListenToChannelExtensionBroadcast(string channelId, string extensionId)
         {
-            ListenToTopic($"channel-ext-v1.{channelId}-{extensionId}-broadcast");
+            string topic = $"channel-ext-v1.{channelId}-{extensionId}-broadcast";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -497,7 +509,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
         public void ListenToBitsEvents(string channelTwitchId)
         {
-            ListenToTopic($"channel-bits-events-v1.{channelTwitchId}");
+            string topic = $"channel-bits-events-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -506,7 +520,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel Id of channel to listen to commerce events on.</param>
         public void ListenToCommerce(string channelTwitchId)
         {
-            ListenToTopic($"channel-commerce-events-v1.{channelTwitchId}");
+            string topic = $"channel-commerce-events-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -524,7 +540,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel to listen to whispers on.</param>
         public void ListenToWhispers(string channelTwitchId)
         {
-            ListenToTopic($"whispers.{channelTwitchId}");
+            string topic = $"whispers.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <summary>
@@ -533,7 +551,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelId">Id of the channel to listen to.</param>
         public void ListenToSubscriptions(string channelId)
         {
-            ListenToTopic($"channel-subscribe-events-v1.{channelId}");
+            string topic = $"channel-subscribe-events-v1.{channelId}";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
         }
         #endregion
 

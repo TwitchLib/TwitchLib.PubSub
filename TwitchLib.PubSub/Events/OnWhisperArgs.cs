@@ -11,5 +11,10 @@ namespace TwitchLib.PubSub.Events
         /// Property representing the whisper object.
         /// </summary>
         public Whisper Whisper;
+
+        /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
     }
 }
