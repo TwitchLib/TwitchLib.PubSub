@@ -252,7 +252,6 @@ namespace TwitchLib.PubSub
                         {
                             if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
                             {
-                                Console.WriteLine(request.Topic);
                                 OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
                             }
                         }
