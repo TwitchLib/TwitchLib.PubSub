@@ -11,17 +11,17 @@ namespace TwitchLib.PubSub.Models
         /// Unique communication token.
         /// </summary>
         /// <value>The nonce.</value>
-        public string Nonce { get; protected set; }
+        public string Nonce { get; }
         /// <summary>
         /// PubSub request type.
         /// </summary>
         /// <value>The type of the request.</value>
-        public PubSubRequestType RequestType { get; protected set; }
+        public PubSubRequestType RequestType { get; }
         /// <summary>
         /// Topic that we are interested in.
         /// </summary>
         /// <value>The topic.</value>
-        public string Topic { get; protected set; }
+        public string Topic { get; }
 
         /// <summary>
         /// PreviousRequest model constructor.

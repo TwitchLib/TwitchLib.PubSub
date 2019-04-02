@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace TwitchLib.PubSub.Common
 {
@@ -25,7 +26,7 @@ namespace TwitchLib.PubSub.Common
         /// <returns>System.String.</returns>
         public static string Base64Encode(string plainText)
         {
-            byte[] plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
             return Convert.ToBase64String(plainTextBytes);
         }
     }

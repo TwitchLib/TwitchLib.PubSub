@@ -4,9 +4,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <summary>
     /// Following model constructor.
-    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// Implements the <see cref="MessageData" />
     /// </summary>
-    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
     public class Following : MessageData
     {
@@ -14,17 +14,17 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Following user display name.
         /// </summary>
         /// <value>The display name.</value>
-        public string DisplayName { get; protected set; }
+        public string DisplayName { get; }
         /// <summary>
         /// Following user username.
         /// </summary>
         /// <value>The username.</value>
-        public string Username { get; protected set; }
+        public string Username { get; }
         /// <summary>
         /// Following user user-id.
         /// </summary>
         /// <value>The user identifier.</value>
-        public string UserId { get; protected set; }
+        public string UserId { get; }
         /// <summary>
         /// Gets the followed channel identifier.
         /// </summary>
@@ -37,7 +37,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <param name="jsonStr">The json string.</param>
         public Following(string jsonStr)
         {
-            JToken json = JObject.Parse(jsonStr);
+            var json = JObject.Parse(jsonStr);
             DisplayName = json["display_name"].ToString();
             Username = json["username"].ToString();
             UserId = json["user_id"].ToString();

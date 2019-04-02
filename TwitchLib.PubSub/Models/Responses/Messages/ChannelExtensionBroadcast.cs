@@ -5,9 +5,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <summary>
     /// VideoPlayback model constructor.
-    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// Implements the <see cref="MessageData" />
     /// </summary>
-    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
     public class ChannelExtensionBroadcast : MessageData
     {
@@ -15,7 +15,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Video playback type
         /// </summary>
         /// <value>The messages.</value>
-        public List<string> Messages { get; protected set; } = new List<string>();
+        public List<string> Messages { get; } = new List<string>();
 
         /// <summary>
         /// VideoPlayback constructor.
@@ -23,8 +23,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <param name="jsonStr">The json string.</param>
         public ChannelExtensionBroadcast(string jsonStr)
         {
-            JToken json = JObject.Parse(jsonStr);
-            foreach (JToken msg in json["content"])
+            var json = JObject.Parse(jsonStr);
+            foreach (var msg in json["content"])
                 Messages.Add(msg.ToString());
         }
     }

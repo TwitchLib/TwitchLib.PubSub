@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class OnChannelExtensionBroadcastArgs.
     /// </summary>
-    public class OnChannelExtensionBroadcastArgs
+    public class OnChannelExtensionBroadcastArgs : EventArgs
     {
         /// <summary>
         /// Property containing the payload send to the specified extension on the specified channel.

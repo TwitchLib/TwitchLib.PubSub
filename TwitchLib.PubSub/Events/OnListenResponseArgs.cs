@@ -1,9 +1,13 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+using TwitchLib.PubSub.Models.Responses;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing arguments for a listen response.
     /// </summary>
-    public class OnListenResponseArgs
+    public class OnListenResponseArgs : EventArgs
     {
         /// <summary>
         /// Property representing the topic that was listened to
@@ -12,7 +16,7 @@
         /// <summary>
         /// Property representing the response as Response object
         /// </summary>
-        public Models.Responses.Response Response;
+        public Response Response;
         /// <summary>
         /// Property representing if request was successful.
         /// </summary>

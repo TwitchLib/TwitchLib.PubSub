@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing emotesonly off event.
     /// </summary>
-    public class OnEmoteOnlyOffArgs
+    public class OnEmoteOnlyOffArgs : EventArgs
     {
         /// <summary>
         /// Property representing moderator who issued command.

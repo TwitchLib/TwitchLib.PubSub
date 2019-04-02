@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// OnUnban event arguments class.
     /// </summary>
-    public class OnUnbanArgs
+    public class OnUnbanArgs : EventArgs
     {
         /// <summary>
         /// Name of user that was unbanned

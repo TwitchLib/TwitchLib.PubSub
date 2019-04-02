@@ -3,21 +3,24 @@ using System.Collections.Generic;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class SubMessage.
+    /// Implements the <see cref="MessageData" />
+    /// <seealso cref="MessageData" />
     /// </summary>
-    public class SubMessage
+    public class SubMessage : MessageData
     {
         /// <summary>
         /// Gets or sets the message.
         /// </summary>
         /// <value>The message.</value>
-        public string Message { get; protected set; }
+        public string Message { get; }
         /// <summary>
         /// Gets or sets the emotes.
         /// </summary>
         /// <value>The emotes.</value>
-        public List<Emote> Emotes { get; protected set; } = new List<Emote>();
+        public List<Emote> Emotes { get; } = new List<Emote>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SubMessage"/> class.
@@ -26,7 +29,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public SubMessage(JToken json)
         {
             Message = json.SelectToken("message")?.ToString();
-            foreach (JToken token in json.SelectToken("emotes"))
+            foreach (var token in json.SelectToken("emotes"))
                 Emotes.Add(new Emote(token));
         }
 
@@ -39,17 +42,17 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             /// Gets or sets the start.
             /// </summary>
             /// <value>The start.</value>
-            public int Start { get; protected set; }
+            public int Start { get; }
             /// <summary>
             /// Gets or sets the end.
             /// </summary>
             /// <value>The end.</value>
-            public int End { get; protected set; }
+            public int End { get; }
             /// <summary>
             /// Gets or sets the identifier.
             /// </summary>
             /// <value>The identifier.</value>
-            public int Id { get; protected set; }
+            public int Id { get; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Emote"/> class.

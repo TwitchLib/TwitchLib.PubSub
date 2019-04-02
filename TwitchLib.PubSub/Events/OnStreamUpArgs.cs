@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing when a stream starts event.
     /// </summary>
-    public class OnStreamUpArgs
+    public class OnStreamUpArgs : EventArgs
     {
         /// <summary>
         /// Property representing the server time.

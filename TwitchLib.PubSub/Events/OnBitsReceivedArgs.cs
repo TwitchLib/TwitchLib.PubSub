@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Object representing the arguments for bits received event
     /// </summary>
-    public class OnBitsReceivedArgs
+    public class OnBitsReceivedArgs : EventArgs
     {
         /// <summary>
         /// Property of for username.

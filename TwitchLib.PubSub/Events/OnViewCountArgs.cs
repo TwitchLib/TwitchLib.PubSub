@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// ViewCount arguments class.
     /// </summary>
-    public class OnViewCountArgs
+    public class OnViewCountArgs : EventArgs
     {
         /// <summary>
         /// Server time issued by Twitch.

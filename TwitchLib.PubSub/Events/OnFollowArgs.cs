@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class OnFollowArgs.
     /// </summary>
-    public class OnFollowArgs
+    public class OnFollowArgs : EventArgs
     {
         /// <summary>
         /// The followed channel identifier

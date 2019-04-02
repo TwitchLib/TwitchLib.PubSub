@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing event where r9k was enabled
     /// </summary>
-    public class OnR9kBetaArgs
+    public class OnR9kBetaArgs : EventArgs
     {
         /// <summary>
         /// Property representing moderator that issued command.

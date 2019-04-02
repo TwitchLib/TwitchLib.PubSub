@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing subscriber only mode turning off event.
     /// </summary>
-    public class OnSubscribersOnlyOffArgs
+    public class OnSubscribersOnlyOffArgs : EventArgs
     {
         /// <summary>
         /// Property representing the moderator that issued the command.

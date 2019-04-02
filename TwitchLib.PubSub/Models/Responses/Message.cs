@@ -12,7 +12,7 @@ namespace TwitchLib.PubSub.Models.Responses
         /// Topic that the message is relevant to.
         /// </summary>
         /// <value>The topic.</value>
-        public string Topic { get; protected set; }
+        public string Topic { get; }
         /// <summary>
         /// Model containing data of the message.
         /// </summary>
@@ -24,9 +24,9 @@ namespace TwitchLib.PubSub.Models.Responses
         /// <param name="jsonStr">The json string.</param>
         public Message(string jsonStr)
         {
-            JToken json = JObject.Parse(jsonStr).SelectToken("data");
+            var json = JObject.Parse(jsonStr).SelectToken("data");
             Topic = json.SelectToken("topic")?.ToString();
-            string encodedJsonMessage = json.SelectToken("message").ToString();
+            var encodedJsonMessage = json.SelectToken("message").ToString();
             switch (Topic?.Split('.')[0])
             {
                 case "chat_moderator_actions":

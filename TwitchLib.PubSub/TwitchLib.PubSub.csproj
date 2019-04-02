@@ -11,7 +11,7 @@
     <PackageIconUrl>https://colejelinek.com/dev/twitchlib.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/TwitchLib/TwitchLib.PubSub</PackageProjectUrl>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
-    <Copyright>Copyright 2018</Copyright>
+    <Copyright>Copyright 2019</Copyright>
     <PackageReleaseNotes>
       WebSocket submodule removed, TwitchLib.Communication added, commerce bug fixed, whisper recipient id from long to string
       3.0.1 brings in Communication changes
@@ -24,8 +24,8 @@
     <FileVersion>3.0.3</FileVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
     <PackageReference Include="TwitchLib.Communication" Version="1.0.3" />
   </ItemGroup>
 </Project>
