@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// OnMessageDeleted event arguments class.
     /// </summary>
-    public class OnMessageDeletedArgs
+    public class OnMessageDeletedArgs : EventArgs
     {
         /// <summary>
         /// Name of the user whose message was deleted

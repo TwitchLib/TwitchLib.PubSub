@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing arguments of on host event.
     /// </summary>
-    public class OnHostArgs
+    public class OnHostArgs : EventArgs
     {
         /// <summary>
         /// Property representing moderator who issued command.

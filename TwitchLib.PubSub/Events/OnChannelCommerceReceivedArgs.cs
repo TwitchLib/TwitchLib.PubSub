@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Object representing the arguments for channel commerce event
     /// </summary>
-    public class OnChannelCommerceReceivedArgs
+    public class OnChannelCommerceReceivedArgs : EventArgs
     {
         /// <summary>
         /// Property for username.

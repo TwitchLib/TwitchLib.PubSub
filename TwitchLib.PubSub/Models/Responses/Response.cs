@@ -13,17 +13,17 @@ namespace TwitchLib.PubSub.Models.Responses
         /// IF error exists, it will be here
         /// </summary>
         /// <value>The error.</value>
-        public string Error { get; protected set; }
+        public string Error { get; }
         /// <summary>
         /// Unique communication token
         /// </summary>
         /// <value>The nonce.</value>
-        public string Nonce { get; protected set; }
+        public string Nonce { get; }
         /// <summary>
         /// Whether or not successful
         /// </summary>
         /// <value><c>true</c> if successful; otherwise, <c>false</c>.</value>
-        public bool Successful { get; protected set; }
+        public bool Successful { get; }
 
         /// <summary>
         /// Response model constructor.

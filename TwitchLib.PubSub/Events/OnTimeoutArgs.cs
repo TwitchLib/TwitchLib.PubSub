@@ -2,10 +2,11 @@
 
 namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class representing timeout event.
     /// </summary>
-    public class OnTimeoutArgs
+    public class OnTimeoutArgs : EventArgs
     {
         /// <summary>
         /// Property representing the timedout user id.

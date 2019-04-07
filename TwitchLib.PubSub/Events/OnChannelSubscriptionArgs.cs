@@ -1,11 +1,13 @@
-﻿using TwitchLib.PubSub.Models.Responses.Messages;
+﻿using System;
+using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class OnChannelSubscriptionArgs.
     /// </summary>
-    public class OnChannelSubscriptionArgs
+    public class OnChannelSubscriptionArgs : EventArgs
     {
         /// <summary>
         /// The subscription

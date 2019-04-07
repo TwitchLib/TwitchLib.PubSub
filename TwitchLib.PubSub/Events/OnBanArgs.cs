@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Object representing the arguments for a ban event
     /// </summary>
-    public class OnBanArgs
+    public class OnBanArgs : EventArgs
     {
         /// <summary>
         /// Property representing banned user id

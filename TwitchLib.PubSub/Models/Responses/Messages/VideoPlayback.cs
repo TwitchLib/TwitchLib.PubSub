@@ -5,9 +5,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <summary>
     /// VideoPlayback model constructor.
-    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// Implements the <see cref="MessageData" />
     /// </summary>
-    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
     public class VideoPlayback : MessageData
     {
@@ -15,22 +15,22 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Video playback type
         /// </summary>
         /// <value>The type.</value>
-        public VideoPlaybackType Type { get; protected set; }
+        public VideoPlaybackType Type { get; }
         /// <summary>
         /// Server time stamp
         /// </summary>
         /// <value>The server time.</value>
-        public string ServerTime { get; protected set; }
+        public string ServerTime { get; }
         /// <summary>
         /// Current delay (if one exists)
         /// </summary>
         /// <value>The play delay.</value>
-        public int PlayDelay { get; protected set; }
+        public int PlayDelay { get; }
         /// <summary>
         /// Viewer count
         /// </summary>
         /// <value>The viewers.</value>
-        public int Viewers { get; protected set; }
+        public int Viewers { get; }
 
         /// <summary>
         /// VideoPlayback constructor.

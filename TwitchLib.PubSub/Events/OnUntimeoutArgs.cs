@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Untimeout argument class.
     /// </summary>
-    public class OnUntimeoutArgs
+    public class OnUntimeoutArgs : EventArgs
     {
         /// <summary>
         /// User that was untimed out (ie unbanned for a timeout)

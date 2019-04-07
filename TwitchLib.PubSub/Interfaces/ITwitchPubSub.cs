@@ -17,6 +17,10 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
         /// <summary>
+        /// Occurs when [on channel extension broadcast].
+        /// </summary>
+        event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
+        /// <summary>
         /// Occurs when [on channel subscription].
         /// </summary>
         event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
@@ -24,6 +28,10 @@ namespace TwitchLib.PubSub.Interfaces
         /// Occurs when [on clear].
         /// </summary>
         event EventHandler<OnClearArgs> OnClear;
+        /// <summary>
+        /// Occurs when [on channel commerce].
+        /// </summary>
+        event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
         /// <summary>
         /// Occurs when [on emote only].
         /// </summary>
@@ -33,9 +41,17 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnEmoteOnlyOffArgs> OnEmoteOnlyOff;
         /// <summary>
+        /// Occurs when [on follow].
+        /// </summary>
+        event EventHandler<OnFollowArgs> OnFollow;
+        /// <summary>
         /// Occurs when [on host].
         /// </summary>
         event EventHandler<OnHostArgs> OnHost;
+        /// <summary>
+        /// Occurs when [on message deleted].
+        /// </summary>
+        event EventHandler<OnMessageDeletedArgs> OnMessageDeleted; 
         /// <summary>
         /// Occurs when [on listen response].
         /// </summary>
@@ -115,11 +131,27 @@ namespace TwitchLib.PubSub.Interfaces
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToBitsEvents(string channelTwitchId);
         /// <summary>
+        /// Listens to extension channel broadcast messages.
+        /// </summary>
+        /// <param name="channelId">The channel twitch identifier.</param>
+        /// <param name="extensionId">The extension identifier.</param>
+        void ListenToChannelExtensionBroadcast(string channelId, string extensionId);
+        /// <summary>
         /// Listens to chat moderator actions.
         /// </summary>
         /// <param name="myTwitchId">My twitch identifier.</param>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId);
+        /// <summary>
+        /// Listens to commerce events.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToCommerce(string channelTwitchId);
+        /// <summary>
+        /// Listens to follows.
+        /// </summary>
+        /// <param name="channelId">The channel twitch identifier.</param>
+        void ListenToFollows(string channelId);
         /// <summary>
         /// Listens to subscriptions.
         /// </summary>

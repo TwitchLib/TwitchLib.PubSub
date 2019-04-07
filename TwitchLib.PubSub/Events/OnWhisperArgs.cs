@@ -1,11 +1,13 @@
-﻿using TwitchLib.PubSub.Models.Responses.Messages;
+﻿using System;
+using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// [INCOMPLETE/NOT_FULLY_SUPPORTED]Whisper arguement class.
     /// </summary>
-    public class OnWhisperArgs
+    public class OnWhisperArgs : EventArgs
     {
         /// <summary>
         /// Property representing the whisper object.

@@ -5,9 +5,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <summary>
     /// ChatModeratorActions model.
-    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// Implements the <see cref="MessageData" />
     /// </summary>
-    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
     public class ChatModeratorActions : MessageData
     {
@@ -15,32 +15,32 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Topic relevant to this messagedata type.
         /// </summary>
         /// <value>The type.</value>
-        public string Type { get; protected set; }
+        public string Type { get; }
         /// <summary>
         /// The specific moderation action.
         /// </summary>
         /// <value>The moderation action.</value>
-        public string ModerationAction { get; protected set; }
+        public string ModerationAction { get; }
         /// <summary>
         /// Arguments provided in moderation action.
         /// </summary>
         /// <value>The arguments.</value>
-        public List<string> Args { get; protected set; } = new List<string>();
+        public List<string> Args { get; } = new List<string>();
         /// <summary>
         /// Moderator that performed action.
         /// </summary>
         /// <value>The created by.</value>
-        public string CreatedBy { get; protected set; }
+        public string CreatedBy { get; }
         /// <summary>
         /// User Id of the user that performed the Action.
         /// </summary>
         /// <value>The created by user identifier.</value>
-        public string CreatedByUserId { get; protected set; }
+        public string CreatedByUserId { get; }
         /// <summary>
         /// User Id of user that received Action.
         /// </summary>
         /// <value>The target user identifier.</value>
-        public string TargetUserId { get; protected set; }
+        public string TargetUserId { get; }
 
         /// <summary>
         /// ChatModeratorActions model constructor.
@@ -48,11 +48,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <param name="jsonStr">The json string.</param>
         public ChatModeratorActions(string jsonStr)
         {
-            JToken json = JObject.Parse(jsonStr).SelectToken("data");
+            var json = JObject.Parse(jsonStr).SelectToken("data");
             Type = json.SelectToken("type")?.ToString();
             ModerationAction = json.SelectToken("moderation_action")?.ToString();
             if (json.SelectToken("args") != null)
-                foreach (JToken arg in json.SelectToken("args"))
+                foreach (var arg in json.SelectToken("args"))
                     Args.Add(arg.ToString());
             CreatedBy = json.SelectToken("created_by").ToString();
             CreatedByUserId = json.SelectToken("created_by_user_id").ToString();

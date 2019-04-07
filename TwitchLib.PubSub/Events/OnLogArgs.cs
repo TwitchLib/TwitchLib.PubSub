@@ -1,9 +1,12 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
+    /// <inheritdoc />
     /// <summary>
     /// Class OnLogArgs.
     /// </summary>
-    public class OnLogArgs
+    public class OnLogArgs : EventArgs
     {
         /// <summary>
         /// Property representing data received from Twitch

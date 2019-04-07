@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using TwitchLib.PubSub.Enums;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
     /// <summary>
     /// Class representing a whisper received via PubSub.
-    /// Implements the <see cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// Implements the <see cref="MessageData" />
     /// </summary>
-    /// <seealso cref="TwitchLib.PubSub.Models.Responses.Messages.MessageData" />
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
     public class Whisper : MessageData
     {
@@ -15,27 +16,27 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Type of MessageData
         /// </summary>
         /// <value>The type.</value>
-        public string Type { get; protected set; }
+        public string Type { get; }
         /// <summary>
         /// Enum of the Message type
         /// </summary>
         /// <value>The type enum.</value>
-        public Enums.WhisperType TypeEnum { get; protected set; }
+        public WhisperType TypeEnum { get; }
         /// <summary>
         /// Data identifier in MessageData
         /// </summary>
         /// <value>The data.</value>
-        public string Data { get; protected set; }
+        public string Data { get; }
         /// <summary>
         /// Object that houses the data accompanying the type.
         /// </summary>
         /// <value>The data object whisper received.</value>
-        public DataObjWhisperReceived DataObjectWhisperReceived { get; protected set; }
+        public DataObjWhisperReceived DataObjectWhisperReceived { get; }
         /// <summary>
         /// Object that houses the data accompanying the type.
         /// </summary>
         /// <value>The data object thread.</value>
-        public DataObjThread DataObjectThread { get; protected set; }
+        public DataObjThread DataObjectThread { get; }
 
         /// <summary>
         /// Whisper object constructor.
@@ -43,7 +44,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <param name="jsonStr">The json string.</param>
         public Whisper(string jsonStr)
         {
-            JObject json = JObject.Parse(jsonStr);
+            var json = JObject.Parse(jsonStr);
             Type = json.SelectToken("type").ToString();
             Data = json.SelectToken("data").ToString();
             switch (Type)
@@ -71,27 +72,27 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             /// Gets or sets the identifier.
             /// </summary>
             /// <value>The identifier.</value>
-            public string Id { get; protected set; }
+            public string Id { get; }
             /// <summary>
             /// Gets or sets the last read.
             /// </summary>
             /// <value>The last read.</value>
-            public long LastRead { get; protected set; }
+            public long LastRead { get; }
             /// <summary>
             /// Gets or sets a value indicating whether this <see cref="DataObjThread"/> is archived.
             /// </summary>
             /// <value><c>true</c> if archived; otherwise, <c>false</c>.</value>
-            public bool Archived { get; protected set; }
+            public bool Archived { get; }
             /// <summary>
             /// Gets or sets a value indicating whether this <see cref="DataObjThread"/> is muted.
             /// </summary>
             /// <value><c>true</c> if muted; otherwise, <c>false</c>.</value>
-            public bool Muted { get; protected set; }
+            public bool Muted { get; }
             /// <summary>
             /// Gets or sets the spam information.
             /// </summary>
             /// <value>The spam information.</value>
-            public SpamInfoObj SpamInfo { get; protected set; }
+            public SpamInfoObj SpamInfo { get; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="DataObjThread"/> class.
@@ -115,12 +116,12 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 /// Gets or sets the likelihood.
                 /// </summary>
                 /// <value>The likelihood.</value>
-                public string Likelihood { get; protected set; }
+                public string Likelihood { get; }
                 /// <summary>
                 /// Gets or sets the last marked not spam.
                 /// </summary>
                 /// <value>The last marked not spam.</value>
-                public long LastMarkedNotSpam { get; protected set; }
+                public long LastMarkedNotSpam { get; }
 
                 /// <summary>
                 /// Initializes a new instance of the <see cref="SpamInfoObj"/> class.
