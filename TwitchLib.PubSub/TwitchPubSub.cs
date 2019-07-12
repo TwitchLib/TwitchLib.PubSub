@@ -144,7 +144,7 @@ namespace TwitchLib.PubSub
                     {
                         foreach (var request in _previousRequests)
                         {
-                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
+                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
                             {
                                 OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
                             }
