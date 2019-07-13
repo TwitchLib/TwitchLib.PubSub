@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub.Common;
 
 namespace TwitchLib.PubSub
 {
@@ -282,13 +283,6 @@ namespace TwitchLib.PubSub
             UnaccountedFor(message);
         }
 
-        private static readonly Random Random = new Random();
-        private static string GenerateNonce()
-        {
-            return new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
-                .Select(s => s[Random.Next(s.Length)]).ToArray());
-        }
-
         private void ListenToTopic(string topic)
         {
             _topicList.Add(topic);
@@ -301,7 +295,7 @@ namespace TwitchLib.PubSub
                 oauth = oauth.Replace("oauth:", "");
             }
 
-            var nonce = GenerateNonce();
+            var nonce = Nonce.Generate();
 
             var topics = new JArray();
             foreach (var val in _topicList)
