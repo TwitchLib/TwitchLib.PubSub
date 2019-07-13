@@ -291,10 +291,8 @@ namespace TwitchLib.PubSub
 
         public void SendTopics(string oauth = null, bool unlisten = false)
         {
-            if (oauth != null && oauth.Contains("oauth:"))
-            {
-                oauth = oauth.Replace("oauth:", "");
-            }
+            if (oauth == null) throw new ArgumentException("The 'oauth' parameter is required.  See https://dev.twitch.tv/docs/pubsub/#authentication for more details.", nameof(oauth));
+            if (_topicList.Count == 0) return;
 
             var nonce = Nonce.Generate();
 
@@ -310,14 +308,11 @@ namespace TwitchLib.PubSub
                 new JProperty("nonce", nonce),
                 new JProperty("data",
                     new JObject(
-                        new JProperty("topics", topics)
+                        new JProperty("topics", topics),
+                        new JProperty("auth_token", oauth.Replace("oauth:", ""))
                         )
                     )
                 );
-            if (oauth != null)
-            {
-                ((JObject)jsonData.SelectToken("data")).Add(new JProperty("auth_token", oauth));
-            }
 
             _socket.Send(jsonData.ToString());
 
