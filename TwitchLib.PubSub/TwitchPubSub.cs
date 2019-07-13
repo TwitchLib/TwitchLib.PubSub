@@ -259,16 +259,17 @@ namespace TwitchLib.PubSub
                             break;
                         case "video-playback":
                             var vP = msg.MessageData as VideoPlayback;
+                            var channelId = msg.Topic.Split('.')[1];
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
-                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime });
+                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.StreamUp:
-                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime });
+                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.ViewCount:
-                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers });
+                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers, ChannelId = channelId });
                                     return;
                             }
                             break;
