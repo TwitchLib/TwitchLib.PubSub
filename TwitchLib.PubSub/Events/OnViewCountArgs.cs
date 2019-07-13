@@ -7,5 +7,7 @@
         public string ServerTime;
         /// <summary>Number of viewers at current time.</summary>
         public int Viewers;
+        /// <summary>The channel id associated with this event.</summary>
+        public string ChannelId;
     }
 }

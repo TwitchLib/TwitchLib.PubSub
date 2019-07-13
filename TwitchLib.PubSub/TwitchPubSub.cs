@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.Communication;
 using TwitchLib.Communication.Models;
+using TwitchLib.PubSub.Common;
 
 namespace TwitchLib.PubSub
 {
@@ -258,16 +259,17 @@ namespace TwitchLib.PubSub
                             break;
                         case "video-playback":
                             var vP = msg.MessageData as VideoPlayback;
+                            var channelId = msg.Topic.Split('.')[1];
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
-                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime });
+                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.StreamUp:
-                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime });
+                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.ViewCount:
-                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers });
+                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers, ChannelId = channelId });
                                     return;
                             }
                             break;
@@ -282,13 +284,6 @@ namespace TwitchLib.PubSub
             UnaccountedFor(message);
         }
 
-        private static readonly Random Random = new Random();
-        private static string GenerateNonce()
-        {
-            return new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
-                .Select(s => s[Random.Next(s.Length)]).ToArray());
-        }
-
         private void ListenToTopic(string topic)
         {
             _topicList.Add(topic);
@@ -296,12 +291,10 @@ namespace TwitchLib.PubSub
 
         public void SendTopics(string oauth = null, bool unlisten = false)
         {
-            if (oauth != null && oauth.Contains("oauth:"))
-            {
-                oauth = oauth.Replace("oauth:", "");
-            }
+            if (oauth == null) throw new ArgumentException("The 'oauth' parameter is required.  See https://dev.twitch.tv/docs/pubsub/#authentication for more details.", nameof(oauth));
+            if (_topicList.Count == 0) return;
 
-            var nonce = GenerateNonce();
+            var nonce = Nonce.Generate();
 
             var topics = new JArray();
             foreach (var val in _topicList)
@@ -315,14 +308,11 @@ namespace TwitchLib.PubSub
                 new JProperty("nonce", nonce),
                 new JProperty("data",
                     new JObject(
-                        new JProperty("topics", topics)
+                        new JProperty("topics", topics),
+                        new JProperty("auth_token", oauth.Replace("oauth:", ""))
                         )
                     )
                 );
-            if (oauth != null)
-            {
-                ((JObject)jsonData.SelectToken("data")).Add(new JProperty("auth_token", oauth));
-            }
 
             _socket.Send(jsonData.ToString());
 
