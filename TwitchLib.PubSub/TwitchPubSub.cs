@@ -289,7 +289,8 @@ namespace TwitchLib.PubSub
                     break;
                 case "message":
                     var msg = new Models.Responses.Message(message);
-                    var channelId = _topicToChannelId[msg.Topic] ?? "";
+                    _topicToChannelId.TryGetValue(msg.Topic, out var channelId);
+                    channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
                         case "channel-subscribe-events-v1":
