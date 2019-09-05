@@ -277,14 +277,16 @@ namespace TwitchLib.PubSub
                     var resp = new Models.Responses.Response(message);
                     if (_previousRequests.Count != 0)
                     {
+                        bool handled = false;
                         foreach (var request in _previousRequests)
                         {
-                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCultureIgnoreCase))
+                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
                             {
                                 OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                handled = true;
                             }
                         }
-                        return;
+                        if (handled) return;
                     }
                     break;
                 case "message":
@@ -363,6 +365,7 @@ namespace TwitchLib.PubSub
                             break;
                         case "channel-bits-events-v1":
                             if (msg.MessageData is ChannelBitsEvents cbe)
+                            {
                                 OnBitsReceived?.Invoke(this, new OnBitsReceivedArgs
                                 {
                                     BitsUsed = cbe.BitsUsed,
@@ -375,9 +378,12 @@ namespace TwitchLib.PubSub
                                     UserId = cbe.UserId,
                                     Username = cbe.Username
                                 });
-                            return;
+                                return;
+                            }
+                            break;
                         case "channel-commerce-events-v1":
                             if (msg.MessageData is ChannelCommerceEvents cce)
+                            {
                                 OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
                                 {
 
@@ -392,11 +398,13 @@ namespace TwitchLib.PubSub
                                     SupportsChannel = cce.SupportsChannel,
                                     PurchaseMessage = cce.PurchaseMessage
                                 });
-                            return;
+                                return;
+                            }
+                            break;
                         case "channel-ext-v1":
                             var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
-                            break;
+                            return;
                         case "video-playback":
                             var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
@@ -416,7 +424,7 @@ namespace TwitchLib.PubSub
                             var f = (Following) msg.MessageData;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
-                            break;
+                            return;
                     }
                     break;
             }
