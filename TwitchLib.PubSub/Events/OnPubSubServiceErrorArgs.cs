@@ -2,10 +2,15 @@
 
 namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Class representing a pubsub service error event.</summary>
-    public class OnPubSubServiceErrorArgs
+    /// <inheritdoc />
+    /// <summary>
+    /// Class representing a pubsub service error event.
+    /// </summary>
+    public class OnPubSubServiceErrorArgs : EventArgs
     {
-        /// <summary>Property representing exception.</summary>
+        /// <summary>
+        /// Property representing exception.
+        /// </summary>
         public Exception Exception;
     }
 }

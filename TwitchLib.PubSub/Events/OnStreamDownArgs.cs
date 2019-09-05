@@ -1,9 +1,16 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Class representing stream going down event.</summary>
-    public class OnStreamDownArgs
+    /// <inheritdoc />
+    /// <summary>
+    /// Class representing stream going down event.
+    /// </summary>
+    public class OnStreamDownArgs : EventArgs
     {
-        /// <summary>Property representing the server time of event.</summary>
+        /// <summary>
+        /// Property representing the server time of event.
+        /// </summary>
         public string ServerTime;
     }
 }

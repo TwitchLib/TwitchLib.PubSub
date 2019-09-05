@@ -2,19 +2,33 @@
 
 namespace TwitchLib.PubSub.Models.Responses
 {
-    /// <summary>Response object detailing pubsub response</summary>
+    /// <summary>
+    /// Response object detailing pubsub response
+    /// </summary>
     public class Response
     {
         //{"type":"RESPONSE","error":"","nonce":"8SYYENPH"}
 
-        /// <summary>IF error exists, it will be here</summary>
-        public string Error { get; protected set; }
-        /// <summary>Unique communication token</summary>
-        public string Nonce { get; protected set; }
-        /// <summary>Whether or not successful</summary>
-        public bool Successful { get; protected set; }
+        /// <summary>
+        /// IF error exists, it will be here
+        /// </summary>
+        /// <value>The error.</value>
+        public string Error { get; }
+        /// <summary>
+        /// Unique communication token
+        /// </summary>
+        /// <value>The nonce.</value>
+        public string Nonce { get; }
+        /// <summary>
+        /// Whether or not successful
+        /// </summary>
+        /// <value><c>true</c> if successful; otherwise, <c>false</c>.</value>
+        public bool Successful { get; }
 
-        /// <summary>Response model constructor.</summary>
+        /// <summary>
+        /// Response model constructor.
+        /// </summary>
+        /// <param name="json">The json.</param>
         public Response(string json)
         {
             Error = JObject.Parse(json).SelectToken("error")?.ToString();

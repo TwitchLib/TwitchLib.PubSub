@@ -3,29 +3,93 @@ using System;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
+    /// <summary>
+    /// ChatModeratorActions model.
+    /// Implements the <see cref="MessageData" />
+    /// </summary>
+    /// <seealso cref="MessageData" />
     /// <inheritdoc />
-    /// <summary>ChatModeratorActions model.</summary>
-    public class  ChannelSubscription: MessageData
+    public class ChannelSubscription : MessageData
     {
-        public string Username { get; protected set; }
-        public string DisplayName { get; protected set; }
-        public string RecipientName { get; protected set; }
-        public string RecipientDisplayName { get; protected set; }
-        public string ChannelName { get; protected set; }
-        public string UserId { get; protected set; }
-        public string ChannelId { get; protected set; }
-        public string RecipientId { get; protected set; }
-        public DateTime Time { get; protected set; }
-        public Enums.SubscriptionPlan SubscriptionPlan { get; protected set; }
-        public string SubscriptionPlanName { get; protected set; }
-        public int Months { get; protected set; }
-        public string Context { get; protected set; }
-        public SubMessage SubMessage { get; protected set; }
+        /// <summary>
+        /// Gets or sets the username.
+        /// </summary>
+        /// <value>The username.</value>
+        public string Username { get; }
+        /// <summary>
+        /// Gets or sets the display name.
+        /// </summary>
+        /// <value>The display name.</value>
+        public string DisplayName { get; }
+        /// <summary>
+        /// Gets or sets the name of the recipient.
+        /// </summary>
+        /// <value>The name of the recipient.</value>
+        public string RecipientName { get; }
+        /// <summary>
+        /// Gets or sets the display name of the recipient.
+        /// </summary>
+        /// <value>The display name of the recipient.</value>
+        public string RecipientDisplayName { get; }
+        /// <summary>
+        /// Gets or sets the name of the channel.
+        /// </summary>
+        /// <value>The name of the channel.</value>
+        public string ChannelName { get; }
+        /// <summary>
+        /// Gets or sets the user identifier.
+        /// </summary>
+        /// <value>The user identifier.</value>
+        public string UserId { get; }
+        /// <summary>
+        /// Gets or sets the channel identifier.
+        /// </summary>
+        /// <value>The channel identifier.</value>
+        public string ChannelId { get; }
+        /// <summary>
+        /// Gets or sets the recipient identifier.
+        /// </summary>
+        /// <value>The recipient identifier.</value>
+        public string RecipientId { get; }
+        /// <summary>
+        /// Gets or sets the time.
+        /// </summary>
+        /// <value>The time.</value>
+        public DateTime Time { get; }
+        /// <summary>
+        /// Gets or sets the subscription plan.
+        /// </summary>
+        /// <value>The subscription plan.</value>
+        public Enums.SubscriptionPlan SubscriptionPlan { get; }
+        /// <summary>
+        /// Gets or sets the name of the subscription plan.
+        /// </summary>
+        /// <value>The name of the subscription plan.</value>
+        public string SubscriptionPlanName { get; }
+        /// <summary>
+        /// Gets or sets the months.
+        /// </summary>
+        /// <value>The months.</value>
+        public int Months { get; }
+        /// <summary>
+        /// Gets or sets the context.
+        /// </summary>
+        /// <value>The context.</value>
+        public string Context { get; }
+        /// <summary>
+        /// Gets or sets the sub message.
+        /// </summary>
+        /// <value>The sub message.</value>
+        public SubMessage SubMessage { get; }
 
-        /// <summary>ChatModeratorActions model constructor.</summary>
+        /// <summary>
+        /// ChatModeratorActions model constructor.
+        /// </summary>
+        /// <param name="jsonStr">The json string.</param>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public ChannelSubscription(string jsonStr)
         {
-            JToken message = JObject.Parse(jsonStr);
+            var message = JObject.Parse(jsonStr);
             Username = message.SelectToken("user_name")?.ToString();
             DisplayName = message.SelectToken("display_name")?.ToString();
             RecipientName = message.SelectToken("recipient_user_name")?.ToString();
