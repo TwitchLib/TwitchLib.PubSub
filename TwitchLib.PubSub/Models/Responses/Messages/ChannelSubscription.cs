@@ -70,7 +70,17 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Gets or sets the months.
         /// </summary>
         /// <value>The months.</value>
-        public int Months { get; }
+        public int? Months { get; }
+        /// <summary>
+        /// Gets or sets the number of cumulative months.
+        /// </summary>
+        /// <value>The cumulative months.</value>
+        public int? CumulativeMonths { get; }
+        /// <summary>
+        /// Gets or sets the number of streak months.
+        /// </summary>
+        /// <value>The streak months.</value>
+        public int? StreakMonths { get; }
         /// <summary>
         /// Gets or sets the context.
         /// </summary>
@@ -117,9 +127,28 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     throw new ArgumentOutOfRangeException();
             }
             SubscriptionPlanName = message.SelectToken("sub_plan_name")?.ToString();
-            Months = int.Parse(message.SelectToken("months").ToString());
             SubMessage = new SubMessage(message.SelectToken("sub_message"));
             Context = message.SelectToken("context")?.ToString();
+
+            var monthsToken = message.SelectToken("months");
+            if (monthsToken != null)
+            {
+                Months = int.Parse(monthsToken.ToString());
+            }
+
+            // these properties are hyphenated unlike all others
+            var cumulativeMonthsToken = message.SelectToken("cumulative-months");
+            var streakMonthsToken = message.SelectToken("streak-months");
+
+            if (cumulativeMonthsToken != null)
+            {
+                CumulativeMonths = int.Parse(cumulativeMonthsToken.ToString());
+            }
+
+            if (streakMonthsToken != null)
+            {
+                StreakMonths = int.Parse(streakMonthsToken.ToString());
+            }
         }
     }
 }
