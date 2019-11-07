@@ -1,0 +1,17 @@
+﻿namespace TwitchLib.PubSub.Enums
+{
+    /// <summary>
+    /// Enum CommunityPointsChannelType
+    /// </summary>
+    public enum CommunityPointsChannelType
+    {
+        /// <summary>
+        /// On reward redeemed
+        /// </summary>
+        RewardRedeemed,
+        /// <summary>
+        /// On custom reward updated
+        /// </summary>
+        CustomRewardUpdated
+    }
+}

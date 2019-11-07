@@ -179,6 +179,16 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
+        ///</summary>
+        public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
+        /// </summary>
+        public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
@@ -432,6 +442,18 @@ namespace TwitchLib.PubSub
                             var f = (Following) msg.MessageData;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
+                            return;
+                        case "community-points-channel-v1":
+                            var cpc = msg.MessageData as CommunityPointsChannel;
+                            switch (cpc?.Type)
+                            {
+                                case CommunityPointsChannelType.RewardRedeemed:
+                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                                case CommunityPointsChannelType.CustomRewardUpdated:
+                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                            }
                             return;
                     }
                     break;
