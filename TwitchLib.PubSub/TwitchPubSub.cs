@@ -189,6 +189,16 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives notice when the leaderboard changes for subs.
+        /// </summary>
+        public event EventHandler<OnLeaderboardEventArgs> OnLeaderboardSubs;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when the leaderboard changes for Bits.
+        /// </summary>
+        public event EventHandler<OnLeaderboardEventArgs> OnLeaderboardBits;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
@@ -444,6 +454,18 @@ namespace TwitchLib.PubSub
                                     return;
                                 case CommunityPointsChannelType.CustomRewardUpdated:
                                     OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                            }
+                            return;
+                        case "leaderboard-events-v1":
+                            var lbe = msg.MessageData as LeaderboardEvents;
+                            switch (lbe?.Type)
+                            {
+                                case LeaderBoardType.bitsUsageByChannel:
+                                    OnLeaderboardBits?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
+                                    return;
+                                case LeaderBoardType.subGiftSent:
+                                    OnLeaderboardSubs?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
                                     return;
                             }
                             return;
