@@ -21,7 +21,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Server time stamp
         /// </summary>
         /// <value>The server DateTime.</value>
-        public DateTime? TimeStamp;
+        public DateTime TimeStamp;
         /// <summary>
         /// Login value associated.
         /// </summary>
