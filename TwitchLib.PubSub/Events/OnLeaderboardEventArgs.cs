@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TwitchLib.PubSub.Models;
 
 namespace TwitchLib.PubSub.Events
 {
@@ -16,6 +17,6 @@ namespace TwitchLib.PubSub.Events
         /// <summary>
         /// Property representing a leaderboard list.
         /// </summary>
-        public List<Tuple<int, int, int>> TopList;
+        public List<LeaderBoard> TopList;
     }
 }
