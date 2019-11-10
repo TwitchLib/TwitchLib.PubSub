@@ -23,6 +23,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <value>The server DateTime.</value>
         public DateTime TimeStamp;
         /// <summary>
+        /// Channel identifier.
+        /// </summary>
+        /// <value>The channel identifier.</value>
+        public string ChannelId;
+        /// <summary>
         /// Login value associated.
         /// </summary>
         /// <value>The login name.</value>
@@ -75,6 +80,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             switch (Type)
             {
                 case CommunityPointsChannelType.RewardRedeemed:
+                    ChannelId = json.SelectToken("channel_id").First.ToString();
                     Login = json.SelectToken("login").ToString();
                     DisplayName = json.SelectToken("display_name").ToString();
                     RewardTitle = json.SelectToken("title").ToString();
@@ -83,6 +89,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Message = json.SelectToken("user_input").ToString();
                     break;
                 case CommunityPointsChannelType.CustomRewardUpdated:
+                    ChannelId = json.SelectToken("channel_id").First.ToString();
                     RewardTitle = json.SelectToken("title").ToString();
                     RewardPrompt = json.SelectToken("prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("cost").ToString());
