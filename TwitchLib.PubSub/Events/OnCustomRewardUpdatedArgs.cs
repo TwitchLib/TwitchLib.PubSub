@@ -13,6 +13,10 @@ namespace TwitchLib.PubSub.Events
         /// </summary>
         public DateTime TimeStamp;
         /// <summary>
+        /// The channel ID the event came from
+        /// </summary>
+        public string ChannelId;
+        /// <summary>
         /// Property representing title of the redeemed reward
         /// </summary>
         public string RewardTitle;

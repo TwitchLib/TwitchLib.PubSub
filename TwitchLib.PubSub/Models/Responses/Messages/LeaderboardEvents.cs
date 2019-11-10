@@ -27,7 +27,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Top 10 list of the leaderboards
         /// </summary>
         /// <value>The list of the leaderboard</value>
-        public List<Tuple<int, int, int>> Top { get; private set; }
+        public List<LeaderBoard> Top { get; private set; }
 
         /// <summary>
         /// LeaderboardEvents constructor.
@@ -52,22 +52,24 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     ChannelId = int.Parse(json.SelectToken("grouping_key").First.ToString());
                     foreach (var TopBits in json["top"])
                     {
-                        Top.Add(new Tuple<int, int, int>(
-                            int.Parse(TopBits["rank"].ToString()),
-                            int.Parse(TopBits["score"].ToString()),
-                            int.Parse(TopBits["entry_key"].ToString())
-                            ));
+                        Top.Add(new LeaderBoard()
+                        {
+                            Place = int.Parse(TopBits["rank"].ToString()),
+                            Score = int.Parse(TopBits["score"].ToString()),
+                            UserId = TopBits["entry_key"].ToString()
+                        });
                     }
                     break;
                 case LeaderBoardType.subGiftSent:
                     ChannelId = int.Parse(json.SelectToken("grouping_key").First.ToString());
                     foreach (var TopSubs in json["top"])
                     {
-                        Top.Add(new Tuple<int, int, int>(
-                            int.Parse(TopSubs["rank"].ToString()),
-                            int.Parse(TopSubs["score"].ToString()),
-                            int.Parse(TopSubs["entry_key"].ToString())
-                        ));
+                        Top.Add(new LeaderBoard()
+                        {
+                            Place = int.Parse(TopSubs["rank"].ToString()),
+                            Score = int.Parse(TopSubs["score"].ToString()),
+                            UserId = TopSubs["entry_key"].ToString()
+                        });
                     }
                     break;
             }

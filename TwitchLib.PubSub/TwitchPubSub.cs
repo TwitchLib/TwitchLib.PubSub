@@ -506,6 +506,18 @@ namespace TwitchLib.PubSub
             _topicList.Add(topic);
         }
 
+        /// <summary>
+        /// Listen to multiple topics.
+        /// </summary>
+        /// <param name="topics">The topics</param>
+        private void ListenToTopics(params string[] topics)
+        {
+            foreach (var topic in topics)
+            {
+                _topicList.Add(topic);
+            }
+        }
+
         /// <inheritdoc />
         /// <summary>
         /// Sends the topics.
@@ -639,6 +651,32 @@ namespace TwitchLib.PubSub
             var topic = $"whispers.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to rewards from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        public void ListenToRewards(string channelTwitchId)
+        {
+            var topic = $"community-points-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to leaderboards from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to leaderboards on.</param>
+        public void ListenToLeaderboards(string channelTwitchId)
+        {
+            var topicBits = $"leaderboard-events-v1.bits-usage-by-channel-v1-{channelTwitchId}-WEEK";
+            var topicSubs = $"leaderboard-events-v1.sub-gift-sent-{channelTwitchId}-WEEK";
+            _topicToChannelId[topicBits] = channelTwitchId;
+            _topicToChannelId[topicSubs] = channelTwitchId;
+            ListenToTopics(topicBits, topicSubs);
         }
 
         /// <inheritdoc />
