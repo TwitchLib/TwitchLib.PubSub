@@ -75,24 +75,24 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     break;
             }
 
-            TimeStamp = DateTime.Parse(json.SelectToken("timestamp")?.ToString());
+            TimeStamp = DateTime.Parse(json.SelectToken("data.timestamp").ToString());
 
             switch (Type)
             {
                 case CommunityPointsChannelType.RewardRedeemed:
-                    ChannelId = json.SelectToken("channel_id").First.ToString();
-                    Login = json.SelectToken("login").ToString();
-                    DisplayName = json.SelectToken("display_name").ToString();
-                    RewardTitle = json.SelectToken("title").ToString();
-                    RewardPrompt = json.SelectToken("prompt").ToString();
-                    RewardCost = int.Parse(json.SelectToken("cost").ToString());
-                    Message = json.SelectToken("user_input").ToString();
+                    ChannelId = json.SelectToken("data.redemption.channel_id").ToString();
+                    Login = json.SelectToken("data.redemption.user.login").ToString();
+                    DisplayName = json.SelectToken("data.redemption.user.display_name").ToString();
+                    RewardTitle = json.SelectToken("data.redemption.reward.title").ToString();
+                    RewardPrompt = json.SelectToken("data.redemption.reward.prompt").ToString();
+                    RewardCost = int.Parse(json.SelectToken("data.redemption.reward.cost").ToString());
+                    Message = json.SelectToken("data.user_input")?.ToString();
                     break;
                 case CommunityPointsChannelType.CustomRewardUpdated:
-                    ChannelId = json.SelectToken("channel_id").First.ToString();
-                    RewardTitle = json.SelectToken("title").ToString();
-                    RewardPrompt = json.SelectToken("prompt").ToString();
-                    RewardCost = int.Parse(json.SelectToken("cost").ToString());
+                    ChannelId = json.SelectToken("data.updated_reward.channel_id").First.ToString();
+                    RewardTitle = json.SelectToken("data.updated_reward.title").ToString();
+                    RewardPrompt = json.SelectToken("data.updated_reward.prompt").ToString();
+                    RewardCost = int.Parse(json.SelectToken("data.updated_reward.cost").ToString());
                     break;
             }
         }
