@@ -89,7 +89,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Message = json.SelectToken("data.user_input")?.ToString();
                     break;
                 case CommunityPointsChannelType.CustomRewardUpdated:
-                    ChannelId = json.SelectToken("data.updated_reward.channel_id").First.ToString();
+                    ChannelId = json.SelectToken("data.updated_reward.channel_id").ToString();
                     RewardTitle = json.SelectToken("data.updated_reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.updated_reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.updated_reward.cost").ToString());
