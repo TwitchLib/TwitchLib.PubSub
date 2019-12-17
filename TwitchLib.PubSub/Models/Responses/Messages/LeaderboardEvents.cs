@@ -36,7 +36,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         public LeaderboardEvents(string jsonStr)
         {
             JToken json = JObject.Parse(jsonStr);
-            switch (json.SelectToken("domain").First.ToString())
+            switch (json.SelectToken("identifier.domain").ToString())
             {
                 case "bits-usage-by-channel-v1":
                     Type = LeaderBoardType.bitsUsageByChannel;
@@ -49,7 +49,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             switch (Type)
             {
                 case LeaderBoardType.bitsUsageByChannel:
-                    ChannelId = int.Parse(json.SelectToken("grouping_key").First.ToString());
+                    ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
                     foreach (var TopBits in json["top"])
                     {
                         Top.Add(new LeaderBoard()
@@ -61,7 +61,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     }
                     break;
                 case LeaderBoardType.subGiftSent:
-                    ChannelId = int.Parse(json.SelectToken("grouping_key").First.ToString());
+                    ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
                     foreach (var TopSubs in json["top"])
                     {
                         Top.Add(new LeaderBoard()
