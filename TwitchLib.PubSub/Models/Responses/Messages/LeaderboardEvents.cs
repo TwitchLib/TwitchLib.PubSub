@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Enums;
 
@@ -23,11 +22,12 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// </summary>
         /// <value>The channel id</value>
         public int ChannelId { get; private set; }
+
         /// <summary>
         /// Top 10 list of the leaderboards
         /// </summary>
         /// <value>The list of the leaderboard</value>
-        public List<LeaderBoard> Top { get; private set; }
+        public List<LeaderBoard> Top { get; private set; } = new List<LeaderBoard>();
 
         /// <summary>
         /// LeaderboardEvents constructor.
@@ -50,25 +50,25 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 case LeaderBoardType.bitsUsageByChannel:
                     ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
-                    foreach (var TopBits in json["top"])
+                    foreach (JToken TopBits in json["top"].Children())
                     {
                         Top.Add(new LeaderBoard()
                         {
-                            Place = int.Parse(TopBits["rank"].ToString()),
-                            Score = int.Parse(TopBits["score"].ToString()),
-                            UserId = TopBits["entry_key"].ToString()
+                            Place = int.Parse(TopBits.SelectToken("rank").ToString()),
+                            Score = int.Parse(TopBits.SelectToken("score").ToString()),
+                            UserId = TopBits.SelectToken("entry_key").ToString()
                         });
                     }
                     break;
                 case LeaderBoardType.subGiftSent:
                     ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
-                    foreach (var TopSubs in json["top"])
+                    foreach (JToken TopSubs in json["top"].Children())
                     {
                         Top.Add(new LeaderBoard()
                         {
-                            Place = int.Parse(TopSubs["rank"].ToString()),
-                            Score = int.Parse(TopSubs["score"].ToString()),
-                            UserId = TopSubs["entry_key"].ToString()
+                            Place = int.Parse(TopSubs.SelectToken("rank").ToString()),
+                            Score = int.Parse(TopSubs.SelectToken("score").ToString()),
+                            UserId = TopSubs.SelectToken("entry_key").ToString()
                         });
                     }
                     break;
