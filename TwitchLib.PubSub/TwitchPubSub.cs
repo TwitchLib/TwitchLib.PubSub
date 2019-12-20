@@ -469,10 +469,10 @@ namespace TwitchLib.PubSub
                             var lbe = msg.MessageData as LeaderboardEvents;
                             switch (lbe?.Type)
                             {
-                                case LeaderBoardType.bitsUsageByChannel:
+                                case LeaderBoardType.BitsUsageByChannel:
                                     OnLeaderboardBits?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
                                     return;
-                                case LeaderBoardType.subGiftSent:
+                                case LeaderBoardType.SubGiftSent:
                                     OnLeaderboardSubs?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
                                     return;
                             }
