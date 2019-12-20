@@ -29,6 +29,10 @@ namespace TwitchLib.PubSub.Events
         /// </summary>
         public string Message;
         /// <summary>
+        /// Property representing the id of the redeemed reward
+        /// </summary>
+        public Guid RewardId;
+        /// <summary>
         /// Property representing title of the redeemed reward
         /// </summary>
         public string RewardTitle;
