@@ -39,16 +39,16 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             switch (json.SelectToken("identifier.domain").ToString())
             {
                 case "bits-usage-by-channel-v1":
-                    Type = LeaderBoardType.bitsUsageByChannel;
+                    Type = LeaderBoardType.BitsUsageByChannel;
                     break;
                 case "sub-gift-sent":
-                    Type = LeaderBoardType.subGiftSent;
+                    Type = LeaderBoardType.SubGiftSent;
                     break;
             }
 
             switch (Type)
             {
-                case LeaderBoardType.bitsUsageByChannel:
+                case LeaderBoardType.BitsUsageByChannel:
                     ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
                     foreach (JToken TopBits in json["top"].Children())
                     {
@@ -60,7 +60,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                         });
                     }
                     break;
-                case LeaderBoardType.subGiftSent:
+                case LeaderBoardType.SubGiftSent:
                     ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
                     foreach (JToken TopSubs in json["top"].Children())
                     {

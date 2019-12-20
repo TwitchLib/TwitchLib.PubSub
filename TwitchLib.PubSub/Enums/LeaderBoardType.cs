@@ -8,10 +8,10 @@
         /// <summary>
         /// On bits usage by channel
         /// </summary>
-        bitsUsageByChannel,
+        BitsUsageByChannel,
         /// <summary>
         /// On sub gift sent
         /// </summary>
-        subGiftSent
+        SubGiftSent
     }
 }
