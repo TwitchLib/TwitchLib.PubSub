@@ -458,10 +458,10 @@ namespace TwitchLib.PubSub
                             switch (cpc?.Type)
                             {
                                 case CommunityPointsChannelType.RewardRedeemed:
-                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
                                     return;
                                 case CommunityPointsChannelType.CustomRewardUpdated:
-                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, ChannelId =  cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
                                     return;
                             }
                             return;

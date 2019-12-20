@@ -17,15 +17,19 @@ namespace TwitchLib.PubSub.Events
         /// </summary>
         public string ChannelId;
         /// <summary>
-        /// Property representing title of the redeemed reward
+        /// Property representing the id of the updated reward
+        /// </summary>
+        public Guid RewardId;
+        /// <summary>
+        /// Property representing title of the updated reward
         /// </summary>
         public string RewardTitle;
         /// <summary>
-        /// Property representing prompt of the redeemed reward
+        /// Property representing prompt of the updated reward
         /// </summary>
         public string RewardPrompt;
         /// <summary>
-        /// Property representing cost of the redeemed reward
+        /// Property representing cost of the updated reward
         /// </summary>
         public int RewardCost;
     }

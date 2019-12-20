@@ -43,6 +43,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <value>The reward message.</value>
         public string Message { get; protected set; }
         /// <summary>
+        /// Reward Id
+        /// </summary>
+        /// <value>the reward id</value>
+        public Guid RewardId { get; private set; }
+        /// <summary>
         /// Reward title
         /// </summary>
         /// <value>The reward title.</value>
@@ -83,6 +88,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     ChannelId = json.SelectToken("data.redemption.channel_id").ToString();
                     Login = json.SelectToken("data.redemption.user.login").ToString();
                     DisplayName = json.SelectToken("data.redemption.user.display_name").ToString();
+                    RewardId = Guid.Parse(json.SelectToken("data.redemption.id").ToString());
                     RewardTitle = json.SelectToken("data.redemption.reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.redemption.reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.redemption.reward.cost").ToString());
@@ -90,6 +96,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     break;
                 case CommunityPointsChannelType.CustomRewardUpdated:
                     ChannelId = json.SelectToken("data.updated_reward.channel_id").ToString();
+                    RewardId = Guid.Parse(json.SelectToken("data.redemption.id").ToString());
                     RewardTitle = json.SelectToken("data.updated_reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.updated_reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.updated_reward.cost").ToString());
