@@ -179,6 +179,11 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when pubsub receives notice when a custom reward has been created on the specified channel.
+        ///</summary>
+        public event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
         ///</summary>
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
@@ -450,10 +455,13 @@ namespace TwitchLib.PubSub
                             switch (cpc?.Type)
                             {
                                 case CommunityPointsChannelType.RewardRedeemed:
-                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost, Status = cpc.Status });
                                     return;
                                 case CommunityPointsChannelType.CustomRewardUpdated:
                                     OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, ChannelId =  cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                                case CommunityPointsChannelType.CustomRewardCreated:
+                                    OnCustomRewardCreated?.Invoke(this, new OnCustomRewardCreatedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
                                     return;
                             }
                             return;

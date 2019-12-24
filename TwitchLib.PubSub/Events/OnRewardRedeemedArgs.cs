@@ -44,5 +44,9 @@ namespace TwitchLib.PubSub.Events
         /// Property representing cost of the redeemed reward
         /// </summary>
         public int RewardCost;
+        /// <summary>
+        /// Property representing the status of the redeemed reward
+        /// </summary>
+        public string Status;
     }
 }

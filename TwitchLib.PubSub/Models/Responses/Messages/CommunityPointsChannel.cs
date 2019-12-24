@@ -16,17 +16,17 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Community points channel type
         /// </summary>
         /// <value>The type.</value>
-        public CommunityPointsChannelType Type;
+        public CommunityPointsChannelType Type { get; protected set; }
         /// <summary>
         /// Server time stamp
         /// </summary>
         /// <value>The server DateTime.</value>
-        public DateTime TimeStamp;
+        public DateTime TimeStamp { get; protected set; }
         /// <summary>
         /// Channel identifier.
         /// </summary>
         /// <value>The channel identifier.</value>
-        public string ChannelId;
+        public string ChannelId { get; protected set; }
         /// <summary>
         /// Login value associated.
         /// </summary>
@@ -46,7 +46,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Reward Id
         /// </summary>
         /// <value>the reward id</value>
-        public Guid RewardId { get; private set; }
+        public Guid RewardId { get; protected set; }
         /// <summary>
         /// Reward title
         /// </summary>
@@ -62,6 +62,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// </summary>
         /// <value>The reward cost.</value>
         public int RewardCost { get; protected set; }
+        /// <summary>
+        /// Status
+        /// </summary>
+        /// <value>the reward status.</value>
+        public string Status { get; protected set; }
 
         /// <summary>
         /// CommunityPointsChannel constructor.
@@ -74,6 +79,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 case "reward-redeemed":
                     Type = CommunityPointsChannelType.RewardRedeemed;
+                    break;
+                case "custom-reward-created":
+                    Type = CommunityPointsChannelType.CustomRewardCreated;
                     break;
                 case "custom-reward-updated":
                     Type = CommunityPointsChannelType.CustomRewardUpdated;
@@ -93,6 +101,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     RewardPrompt = json.SelectToken("data.redemption.reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.redemption.reward.cost").ToString());
                     Message = json.SelectToken("data.redemption.user_input")?.ToString();
+                    Status = json.SelectToken("data.redemption.status").ToString();
                     break;
                 case CommunityPointsChannelType.CustomRewardUpdated:
                     ChannelId = json.SelectToken("data.updated_reward.channel_id").ToString();
@@ -100,6 +109,13 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     RewardTitle = json.SelectToken("data.updated_reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.updated_reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.updated_reward.cost").ToString());
+                    break;
+                case CommunityPointsChannelType.CustomRewardCreated:
+                    ChannelId = json.SelectToken("data.new_reward.channel_id").ToString();
+                    RewardId = Guid.Parse(json.SelectToken("data.new_reward.id").ToString());
+                    RewardTitle = json.SelectToken("data.new_reward.title").ToString();
+                    RewardPrompt = json.SelectToken("data.new_reward.prompt").ToString();
+                    RewardCost = int.Parse(json.SelectToken("data.new_reward.cost").ToString());
                     break;
             }
         }
