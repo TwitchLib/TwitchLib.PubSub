@@ -12,6 +12,10 @@
         /// <summary>
         /// On custom reward updated
         /// </summary>
-        CustomRewardUpdated
+        CustomRewardUpdated,
+        /// <summary>
+        /// On custom reward created
+        /// </summary>
+        CustomRewardCreated
     }
 }
