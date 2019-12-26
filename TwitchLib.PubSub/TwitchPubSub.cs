@@ -187,6 +187,12 @@ namespace TwitchLib.PubSub
         /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
         ///</summary>
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.</summary>
+        /// </summary>
+        public event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <inheritdoc />
         /// <summary>
         /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
@@ -462,6 +468,9 @@ namespace TwitchLib.PubSub
                                     return;
                                 case CommunityPointsChannelType.CustomRewardCreated:
                                     OnCustomRewardCreated?.Invoke(this, new OnCustomRewardCreatedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                                case CommunityPointsChannelType.CustomRewardDeleted:
+                                    OnCustomRewardDeleted?.Invoke(this, new OnCustomRewardDeletedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt });
                                     return;
                             }
                             return;

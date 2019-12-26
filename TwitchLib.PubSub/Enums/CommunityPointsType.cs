@@ -16,6 +16,10 @@
         /// <summary>
         /// On custom reward created
         /// </summary>
-        CustomRewardCreated
+        CustomRewardCreated,
+        /// <summary>
+        /// On custom reward deleted
+        /// </summary>
+        CustomRewardDeleted
     }
 }
