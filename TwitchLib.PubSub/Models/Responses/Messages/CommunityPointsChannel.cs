@@ -86,6 +86,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 case "custom-reward-updated":
                     Type = CommunityPointsChannelType.CustomRewardUpdated;
                     break;
+                case "custom-reward-deleted":
+                    Type = CommunityPointsChannelType.CustomRewardDeleted;
+                    break;
             }
 
             TimeStamp = DateTime.Parse(json.SelectToken("data.timestamp").ToString());
@@ -116,6 +119,12 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     RewardTitle = json.SelectToken("data.new_reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.new_reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.new_reward.cost").ToString());
+                    break;
+                case CommunityPointsChannelType.CustomRewardDeleted:
+                    ChannelId = json.SelectToken("data.deleted_reward.channel_id").ToString();
+                    RewardId = Guid.Parse(json.SelectToken("data.deleted_reward.id").ToString());
+                    RewardTitle = json.SelectToken("data.deleted_reward.title").ToString();
+                    RewardPrompt = json.SelectToken("data.deleted_reward.prompt").ToString();
                     break;
             }
         }
