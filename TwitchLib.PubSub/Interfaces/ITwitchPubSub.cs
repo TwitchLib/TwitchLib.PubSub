@@ -113,11 +113,19 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnWhisperArgs> OnWhisper;
         /// <summary>
-        /// Occurs when [on custom reward updated].
-        /// </summary>
+        /// Occurs when [on reward created]
+        ///</summary>
+        event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
+        /// <summary>
+        /// Occurs when [on reward updated]
+        ///</summary>
         event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
         /// <summary>
-        /// Occurs when [on reward redeemed].
+        /// Occurs when [on reward deleted]
+        /// </summary>
+        event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
+        /// <summary>
+        /// Occurs when [on reward redeemed]
         /// </summary>
         event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
         /// <summary>
