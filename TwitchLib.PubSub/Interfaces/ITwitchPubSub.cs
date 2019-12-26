@@ -113,6 +113,22 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnWhisperArgs> OnWhisper;
         /// <summary>
+        /// Occurs when [on custom reward updated].
+        /// </summary>
+        event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
+        /// <summary>
+        /// Occurs when [on reward redeemed].
+        /// </summary>
+        event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <summary>
+        /// Occurs when [on leaderboard subs].
+        /// </summary>
+        event EventHandler<OnLeaderboardEventArgs> OnLeaderboardSubs;
+        /// <summary>
+        /// Occurs when [on leaderboard bits].
+        /// </summary>
+        event EventHandler<OnLeaderboardEventArgs> OnLeaderboardBits;
+        /// <summary>
         /// Occurs when [on log].
         /// </summary>
         event EventHandler<OnLogArgs> OnLog;
@@ -167,6 +183,16 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToWhispers(string channelTwitchId);
+        /// <summary>
+        /// Listens to rewards
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToRewards(string channelTwitchId);
+        /// <summary>
+        /// Listens to leaderboards
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToLeaderboards(string channelTwitchId);
         /// <summary>
         /// Sends the topics.
         /// </summary>

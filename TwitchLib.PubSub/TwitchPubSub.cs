@@ -179,6 +179,31 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when pubsub receives notice when a custom reward has been created on the specified channel.
+        ///</summary>
+        public event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
+        ///</summary>
+        public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
+        /// </summary>
+        public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when the leaderboard changes for subs.
+        /// </summary>
+        public event EventHandler<OnLeaderboardEventArgs> OnLeaderboardSubs;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when the leaderboard changes for Bits.
+        /// </summary>
+        public event EventHandler<OnLeaderboardEventArgs> OnLeaderboardBits;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
@@ -425,6 +450,33 @@ namespace TwitchLib.PubSub
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             return;
+                        case "community-points-channel-v1":
+                            var cpc = msg.MessageData as CommunityPointsChannel;
+                            switch (cpc?.Type)
+                            {
+                                case CommunityPointsChannelType.RewardRedeemed:
+                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost, Status = cpc.Status });
+                                    return;
+                                case CommunityPointsChannelType.CustomRewardUpdated:
+                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, ChannelId =  cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                                case CommunityPointsChannelType.CustomRewardCreated:
+                                    OnCustomRewardCreated?.Invoke(this, new OnCustomRewardCreatedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    return;
+                            }
+                            return;
+                        case "leaderboard-events-v1":
+                            var lbe = msg.MessageData as LeaderboardEvents;
+                            switch (lbe?.Type)
+                            {
+                                case LeaderBoardType.BitsUsageByChannel:
+                                    OnLeaderboardBits?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
+                                    return;
+                                case LeaderBoardType.SubGiftSent:
+                                    OnLeaderboardSubs?.Invoke(this, new OnLeaderboardEventArgs { ChannelId = lbe.ChannelId, TopList = lbe.Top });
+                                    return;
+                            }
+                            return;
                     }
                     break;
             }
@@ -452,6 +504,18 @@ namespace TwitchLib.PubSub
         private void ListenToTopic(string topic)
         {
             _topicList.Add(topic);
+        }
+
+        /// <summary>
+        /// Listen to multiple topics.
+        /// </summary>
+        /// <param name="topics">The topics</param>
+        private void ListenToTopics(params string[] topics)
+        {
+            foreach (var topic in topics)
+            {
+                _topicList.Add(topic);
+            }
         }
 
         /// <inheritdoc />
@@ -587,6 +651,32 @@ namespace TwitchLib.PubSub
             var topic = $"whispers.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to rewards from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        public void ListenToRewards(string channelTwitchId)
+        {
+            var topic = $"community-points-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to leaderboards from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to leaderboards on.</param>
+        public void ListenToLeaderboards(string channelTwitchId)
+        {
+            var topicBits = $"leaderboard-events-v1.bits-usage-by-channel-v1-{channelTwitchId}-WEEK";
+            var topicSubs = $"leaderboard-events-v1.sub-gift-sent-{channelTwitchId}-WEEK";
+            _topicToChannelId[topicBits] = channelTwitchId;
+            _topicToChannelId[topicSubs] = channelTwitchId;
+            ListenToTopics(topicBits, topicSubs);
         }
 
         /// <inheritdoc />
