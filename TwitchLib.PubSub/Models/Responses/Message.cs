@@ -56,6 +56,9 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "leaderboard-events-v1":
                     MessageData = new LeaderboardEvents(encodedJsonMessage);
                     break;
+                case "raid":
+                    MessageData = new RaidEvents(encodedJsonMessage);
+                    break;
             }
         }
     }
