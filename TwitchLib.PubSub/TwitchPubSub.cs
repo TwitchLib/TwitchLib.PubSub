@@ -210,6 +210,21 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnLeaderboardEventArgs> OnLeaderboardBits;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives notice when a channel prepares a raid
+        /// </summary>
+        public event EventHandler<OnRaidUpdateArgs> OnRaidUpdate;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when a channel prepares a raid
+        /// </summary>
+        public event EventHandler<OnRaidUpdateV2Args> OnRaidUpdateV2;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when a channel starts the raid
+        /// </summary>
+        public event EventHandler<OnRaidGoArgs> OnRaidGo;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
@@ -486,6 +501,21 @@ namespace TwitchLib.PubSub
                                     return;
                             }
                             return;
+                        case "raid":
+                            var r = msg.MessageData as RaidEvents;
+                            switch (r?.Type)
+                            {
+                                case RaidType.RaidUpdate:
+                                    OnRaidUpdate?.Invoke(this, new OnRaidUpdateArgs{ Id = r.Id, ChannelId = r.ChannelId , TargetChannelId = r.TargetChannelId, AnnounceTime = r.AnnounceTime, RaidTime = r.RaidTime, RemainingDurationSeconds = r.RemainigDurationSeconds, ViewerCount = r.ViewerCount });
+                                    return;
+                                case RaidType.RaidUpdateV2:
+                                    OnRaidUpdateV2?.Invoke(this, new OnRaidUpdateV2Args{ Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
+                                    return;
+                                case RaidType.RaidGo:
+                                    OnRaidGo?.Invoke(this, new OnRaidGoArgs { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
+                                    return;
+                            }
+                            return;
                     }
                     break;
             }
@@ -686,6 +716,18 @@ namespace TwitchLib.PubSub
             _topicToChannelId[topicBits] = channelTwitchId;
             _topicToChannelId[topicSubs] = channelTwitchId;
             ListenToTopics(topicBits, topicSubs);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to raids 'from' specific channel
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to raids get prepared on.</param>
+        public void ListenToRaid(string channelTwitchId)
+        {
+            var topicRaid = $"raid.{channelTwitchId}";
+            _topicToChannelId[topicRaid] = channelTwitchId;
+            ListenToTopic(topicRaid);
         }
 
         /// <inheritdoc />
