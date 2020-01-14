@@ -15,57 +15,57 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <summary>
         /// Raid type
         /// </summary>
-        /// <value></value>
+        /// <value>The raid type</value>
         public RaidType Type { get; protected set; }
         /// <summary>
-        /// 
+        /// Raid id
         /// </summary>
-        /// <value></value>
+        /// <value>The raid id</value>
         public Guid Id { get; protected set; }
         /// <summary>
-        /// 
+        /// Channel Id
         /// </summary>
-        /// <value></value>
+        /// <value>The channel id</value>
         public int ChannelId { get; protected set; }
         /// <summary>
-        /// 
+        /// Target Channel Id
         /// </summary>
-        /// <value></value>
+        /// <value>The target channel id</value>
         public int TargetChannelId { get; protected set; }
         /// <summary>
-        /// 
+        /// Target Login
         /// </summary>
-        /// <value></value>
+        /// <value>The target login name</value>
         public string TargetLogin { get; protected set; }
         /// <summary>
-        /// 
+        /// Target Display Name
         /// </summary>
-        /// <value></value>
+        /// <value>The target display name</value>
         public string TargetDisplayName { get; protected set; }
         /// <summary>
-        /// 
+        /// Target Profile Image
         /// </summary>
-        /// <value></value>
+        /// <value>The target profile image (url)</value>
         public string TargetProfileImage { get; protected set; }
         /// <summary>
-        /// 
+        /// Announce Time
         /// </summary>
-        /// <value></value>
+        /// <value>The announce time</value>
         public DateTime AnnounceTime { get; protected set; }
         /// <summary>
-        /// 
+        /// Raid Time
         /// </summary>
-        /// <value></value>
+        /// <value>The raid time</value>
         public DateTime RaidTime { get; protected set; }
         /// <summary>
-        /// 
+        /// Remaining Duration Seconds
         /// </summary>
-        /// <value></value>
+        /// <value>The remaining duration seconds</value>
         public int RemainigDurationSeconds { get; protected set; }
         /// <summary>
-        /// 
+        /// Viewer Count
         /// </summary>
-        /// <value></value>
+        /// <value>The viewer count</value>
         public int ViewerCount { get; protected set; }
 
         /// <summary>
