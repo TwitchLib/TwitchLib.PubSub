@@ -38,4 +38,3 @@ namespace TwitchLib.PubSub.Events
         public int ViewerCount;
     }
 }
-}
