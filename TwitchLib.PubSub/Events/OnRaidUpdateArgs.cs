@@ -11,7 +11,7 @@ namespace TwitchLib.PubSub.Events
         /// <summary>
         /// The channel ID the event came from
         /// </summary>
-        public int ChannelId;
+        public string ChannelId;
         /// <summary>
         /// Property representing the id of the raid event
         /// </summary>
@@ -19,7 +19,7 @@ namespace TwitchLib.PubSub.Events
         /// <summary>
         /// Property representing the target channel id
         /// </summary>
-        public int TargetChannelId;
+        public string TargetChannelId;
         /// <summary>
         /// Property representing the date when the raid got prepared
         /// </summary>

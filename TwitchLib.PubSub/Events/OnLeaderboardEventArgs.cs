@@ -13,7 +13,7 @@ namespace TwitchLib.PubSub.Events
         /// <summary>
         /// Property representing channel id where the event got issued.
         /// </summary>
-        public int ChannelId;
+        public string ChannelId;
         /// <summary>
         /// Property representing a leaderboard list.
         /// </summary>
