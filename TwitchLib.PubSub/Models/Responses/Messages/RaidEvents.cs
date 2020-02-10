@@ -26,12 +26,12 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Channel Id
         /// </summary>
         /// <value>The channel id</value>
-        public int ChannelId { get; protected set; }
+        public string ChannelId { get; protected set; }
         /// <summary>
         /// Target Channel Id
         /// </summary>
         /// <value>The target channel id</value>
-        public int TargetChannelId { get; protected set; }
+        public string TargetChannelId { get; protected set; }
         /// <summary>
         /// Target Login
         /// </summary>
@@ -93,8 +93,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {                
                 case RaidType.RaidUpdate:
                     Id = Guid.Parse(json.SelectToken("raid.id").ToString());
-                    ChannelId = int.Parse(json.SelectToken("raid.source_id").ToString());
-                    TargetChannelId = int.Parse(json.SelectToken("raid.target_id").ToString());
+                    ChannelId = json.SelectToken("raid.source_id").ToString();
+                    TargetChannelId = json.SelectToken("raid.target_id").ToString();
                     AnnounceTime = DateTime.Parse(json.SelectToken("raid.announce_time").ToString());
                     RaidTime = DateTime.Parse(json.SelectToken("raid.raid_time").ToString());
                     RemainigDurationSeconds = int.Parse(json.SelectToken("raid.remaining_duration_seconds").ToString());
@@ -102,8 +102,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     break;
                 case RaidType.RaidUpdateV2:
                     Id = Guid.Parse(json.SelectToken("raid.id").ToString());
-                    ChannelId = int.Parse(json.SelectToken("raid.source_id").ToString());
-                    TargetChannelId = int.Parse(json.SelectToken("raid.target_id").ToString());
+                    ChannelId = json.SelectToken("raid.source_id").ToString();
+                    TargetChannelId = json.SelectToken("raid.target_id").ToString();
                     TargetLogin = json.SelectToken("raid_target_login").ToString();
                     TargetDisplayName = json.SelectToken("raid.target_display_name").ToString();
                     TargetProfileImage = json.SelectToken("raid.target_profile_picture").ToString();
@@ -111,8 +111,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     break;
                 case RaidType.RaidGo:
                     Id = Guid.Parse(json.SelectToken("raid.id").ToString());
-                    ChannelId = int.Parse(json.SelectToken("raid.source_id").ToString());
-                    TargetChannelId = int.Parse(json.SelectToken("raid.target_id").ToString());
+                    ChannelId = json.SelectToken("raid.source_id").ToString();
+                    TargetChannelId = json.SelectToken("raid.target_id").ToString();
                     TargetLogin = json.SelectToken("raid_target_login").ToString();
                     TargetDisplayName = json.SelectToken("raid.target_display_name").ToString();
                     TargetProfileImage = json.SelectToken("raid.target_profile_picture").ToString();

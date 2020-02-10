@@ -21,7 +21,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// Channel id
         /// </summary>
         /// <value>The channel id</value>
-        public int ChannelId { get; private set; }
+        public string ChannelId { get; private set; }
 
         /// <summary>
         /// Top 10 list of the leaderboards
@@ -49,7 +49,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             switch (Type)
             {
                 case LeaderBoardType.BitsUsageByChannel:
-                    ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
+                    ChannelId = json.SelectToken("identifier.grouping_key").ToString();
                     foreach (JToken TopBits in json["top"].Children())
                     {
                         Top.Add(new LeaderBoard()
@@ -61,7 +61,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     }
                     break;
                 case LeaderBoardType.SubGiftSent:
-                    ChannelId = int.Parse(json.SelectToken("identifier.grouping_key").ToString());
+                    ChannelId = json.SelectToken("identifier.grouping_key").ToString();
                     foreach (JToken TopSubs in json["top"].Children())
                     {
                         Top.Add(new LeaderBoard()
