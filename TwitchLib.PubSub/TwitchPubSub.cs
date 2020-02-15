@@ -182,6 +182,11 @@ namespace TwitchLib.PubSub
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when PubSub receives notice that the stream is playing a commercial.
+        /// </summary>
+        public event EventHandler<OnCommercialArgs> OnCommercial;
         #endregion
 
         /// <summary>
@@ -417,6 +422,9 @@ namespace TwitchLib.PubSub
                                     return;
                                 case VideoPlaybackType.ViewCount:
                                     OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers });
+                                    return;
+                                case VideoPlaybackType.Commercial:
+                                    OnCommercial?.Invoke(this, new OnCommercialArgs { ServerTime = vP.ServerTime, Length = vP.Length });
                                     return;
                             }
                             break;
