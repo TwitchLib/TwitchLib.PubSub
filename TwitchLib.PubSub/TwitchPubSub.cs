@@ -188,7 +188,7 @@ namespace TwitchLib.PubSub
         /// </summary>
         public event EventHandler<OnCommercialArgs> OnCommercial;
         /// <summary>Fires when PubSub receives notice when a user redeems channel points.</summary>
-        public event EventHandler<OnChannelPointsRedemptionArgs> OnChannelPointsRedemption;
+        public event EventHandler<OnChannelPointRedemptionArgs> OnChannelPointRedemption;
         #endregion
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace TwitchLib.PubSub
                             return;
                         case "channel-points-channel-v1":
                             var cP = msg.MessageData as ChannelPointRedemption;
-                            OnChannelPointsRedemption?.Invoke(this, new OnChannelPointsRedemptionArgs
+                            OnChannelPointRedemption?.Invoke(this, new OnChannelPointRedemptionArgs
                             {
                                 Type = cP.Type,
                                 Id = cP.Id,

@@ -1,7 +1,7 @@
 ﻿namespace TwitchLib.PubSub.Events
 {
     /// <summary>Object representing the arguments for the channel points redemption event.</summary>
-    public class OnChannelPointsRedemptionArgs
+    public class OnChannelPointRedemptionArgs
     {
         /// <summary>Property for the redemption type.</summary>
         public string Type;
