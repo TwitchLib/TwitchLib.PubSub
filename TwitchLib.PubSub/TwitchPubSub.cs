@@ -436,23 +436,33 @@ namespace TwitchLib.PubSub
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             return;
                         case "channel-points-channel-v1":
-                            var cP = msg.MessageData as ChannelPointRedemption;
+                            var cpr = msg.MessageData as ChannelPointRedemption;
                             OnChannelPointRedemption?.Invoke(this, new OnChannelPointRedemptionArgs
                             {
-                                Type = cP.Type,
-                                Id = cP.Id,
-                                DisplayName = cP.DisplayName,
+                                Id = cpr.Id,
+                                ChannelId = cpr.ChannelId,
+                                RedeemedAt = cpr.RedeemedAt,
+                                ShouldRedemptionsSkipRequestQueue = cpr.ShouldRedemptionsSkipRequestQueue,
 
-                                RewardId = cP.RewardId,
-                                RewardTitle = cP.RewardTitle,
-                                RewardPrompt = cP.RewardPrompt,
-                                UserInput = cP.UserInput,
+                                RedeemerId = cpr.RedeemerId,
+                                RedeemerDisplayName = cpr.RedeemerDisplayName,
 
-                                RewardCost = cP.RewardCost,
-                                RewardMaxPerStream = cP.RewardMaxPerStream,
+                                RewardId = cpr.RewardId,
+                                RewardTitle = cpr.RewardTitle,
+                                RewardPrompt = cpr.RewardPrompt,
+                                RewardImageUrl = cpr.RewardImageUrl,
+                                RewardBackgroundColor = cpr.RewardBackgroundColor,
 
-                                RewardIsUserInputRequired = cP.RewardIsUserInputRequired,
-                                RewardIsSubOnly = cP.RewardIsSubOnly
+                                RewardCost = cpr.RewardCost,
+                                RewardMaxPerStream = cpr.RewardMaxPerStream,
+
+                                RewardIsUserInputRequired = cpr.RewardIsUserInputRequired,
+                                RewardIsSubOnly = cpr.RewardIsSubOnly,
+                                RewardIsEnabled = cpr.RewardIsEnabled,
+                                RewardIsPaused = cpr.RewardIsPaused,
+                                RewardIsInStock = cpr.RewardIsInStock,
+
+                                UserInput = cpr.UserInput
                             });
                             break;
                     }
