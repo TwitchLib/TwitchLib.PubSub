@@ -50,6 +50,9 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "following":
                     MessageData = new Following(encodedJsonMessage);
                     break;
+                case "channel-points-channel-v1":
+                    MessageData = new RewardRedeemed(encodedJsonMessage);
+                    break;
             }
         }
     }

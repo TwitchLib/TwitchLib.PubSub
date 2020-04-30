@@ -187,6 +187,11 @@ namespace TwitchLib.PubSub
         /// Fires when PubSub receives notice that the stream is playing a commercial.
         /// </summary>
         public event EventHandler<OnCommercialArgs> OnCommercial;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when PubSub receives notice that channel points have been redeemed.
+        /// </summary>
+        public event EventHandler<OnChannelPointsRedeemedArgs> OnChannelPoints;
         #endregion
 
         /// <summary>
@@ -433,6 +438,24 @@ namespace TwitchLib.PubSub
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             return;
+                        case "channel-points-channel-v1":
+                            if (msg.MessageData is RewardRedeemed rre)
+                            {
+                                OnChannelPoints?.Invoke(this, new OnChannelPointsRedeemedArgs()
+                                {
+                                    ChannelId = rre.ChannelId,
+                                    DisplayName = rre.DisplayName,
+                                    UserId = rre.UserId,
+                                    Username = rre.Username,
+                                    PointsUsed = rre.PointsUsed,
+                                    Title = rre.Title,
+                                    Prompt = rre.Prompt,
+                                    UserInput = rre.UserInput,
+                                    Time = rre.Time
+                                });
+                                return;
+                            }
+                            break;
                     }
                     break;
             }
@@ -608,6 +631,19 @@ namespace TwitchLib.PubSub
             _topicToChannelId[topic] = channelId;
             ListenToTopic(topic);
         }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to channel point redemptions.
+        /// </summary>
+        /// <param name="channelId">Id of the channel to listen to.</param>
+        public void ListenToChannelPoints(string channelId)
+        {
+            var topic = $"channel-points-channel-v1.{channelId}";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
+        }
+
         #endregion
 
         /// <inheritdoc />
