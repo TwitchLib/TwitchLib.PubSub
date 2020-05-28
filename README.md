@@ -21,7 +21,13 @@ namespace TwitchLibPubSubExample
     class Program
     {
         private TwitchPubSub client;
+        
         static void Main(string[] args)
+        {
+            Run();
+        }
+        
+        private void Run()
         {
             client = new TwitchPubSub();
 
@@ -35,6 +41,7 @@ namespace TwitchLibPubSubExample
             
             client.Connect();
         }
+        
 
         private void onPubSubServiceConnected(object sender, EventArgs e)
         {
