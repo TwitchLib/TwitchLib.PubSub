@@ -30,7 +30,10 @@ namespace TwitchLibPubSubExample
             client.OnStreamUp += onStreamUp;
             client.OnStreamDown += onStreamDown;
 
-            client.ListenToVideoPlayback("{{CHANNEL}}");
+            client.ListenToVideoPlayback("channelUsername");
+            client.ListenToBitsEvents("channelTwitchID");
+            
+            client.Connect();
         }
 
         private static void onPubSubServiceConnected(object sender, EventArgs e)
