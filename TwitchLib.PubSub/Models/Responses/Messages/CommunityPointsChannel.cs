@@ -89,6 +89,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 case "custom-reward-deleted":
                     Type = CommunityPointsChannelType.CustomRewardDeleted;
                     break;
+                default:
+                    return;
             }
 
             TimeStamp = DateTime.Parse(json.SelectToken("data.timestamp").ToString());
