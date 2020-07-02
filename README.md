@@ -7,6 +7,9 @@
 ## About 
 TwitchLib repository representing all code belonging to the implementation Twitch's PubSub service.
 
+## Note
+Trying to listen to events that an account does not have (bits / subs for example) and require Oauth, will return Bad Oauth. Code accordingly.
+
 ### Example
 ```csharp
 using System;
@@ -17,8 +20,14 @@ namespace TwitchLibPubSubExample
 {
     class Program
     {
-        private static TwitchPubSub client;
+        private TwitchPubSub client;
+        
         static void Main(string[] args)
+        {
+            Run();
+        }
+        
+        private void Run()
         {
             client = new TwitchPubSub();
 
@@ -27,27 +36,31 @@ namespace TwitchLibPubSubExample
             client.OnStreamUp += onStreamUp;
             client.OnStreamDown += onStreamDown;
 
-            client.ListenToVideoPlayback("{{CHANNEL}}");
+            client.ListenToVideoPlayback("channelUsername");
+            client.ListenToBitsEvents("channelTwitchID");
+            
+            client.Connect();
         }
+        
 
-        private static void onPubSubServiceConnected(object sender, EventArgs e)
+        private void onPubSubServiceConnected(object sender, EventArgs e)
         {
             // SendTopics accepts an oauth optionally, which is necessary for some topics
             client.SendTopics();
         }
         
-        private static void onListenResponse(object sender, OnListenResponseArgs e)
+        private void onListenResponse(object sender, OnListenResponseArgs e)
         {
             if (!e.Successful)
                 throw new Exception($"Failed to listen! Response: {e.Response}");
         }
 
-        private static void onStreamUp(object sender, OnStreamUpArgs e)
+        private void onStreamUp(object sender, OnStreamUpArgs e)
         {
             Console.WriteLine($"Stream just went up! Play delay: {e.PlayDelay}, server time: {e.ServerTime}");
         }
 
-        private static void onStreamDown(object sender, OnStreamDownArgs e)
+        private void onStreamDown(object sender, OnStreamDownArgs e)
         {
             Console.WriteLine($"Stream just went down! Server time: {e.ServerTime}");
         }

@@ -1,27 +1,52 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Object representing the arguments for channel commerce event</summary>
-    public class OnChannelCommerceReceivedArgs
+    /// <inheritdoc />
+    /// <summary>
+    /// Object representing the arguments for channel commerce event
+    /// </summary>
+    public class OnChannelCommerceReceivedArgs : EventArgs
     {
-        /// <summary>Property for username.</summary>
+        /// <summary>
+        /// Property for username.
+        /// </summary>
         public string Username;
-        /// <summary>Property for buyer's display name.</summary>
+        /// <summary>
+        /// Property for buyer's display name.
+        /// </summary>
         public string DisplayName;
-        /// <summary>Property for channel's name.</summary>
+        /// <summary>
+        /// Property for channel's name.
+        /// </summary>
         public string ChannelName;
-        /// <summary>Property for buyer's user ID.</summary>
+        /// <summary>
+        /// Property for buyer's user ID.
+        /// </summary>
         public string UserId;
-        /// <summary>Property for channel's ID.</summary>
+        /// <summary>
+        /// Property for channel's ID.
+        /// </summary>
         public string ChannelId;
-        /// <summary>Property for timestamp.</summary>
+        /// <summary>
+        /// Property for timestamp.
+        /// </summary>
         public string Time;
-        /// <summary>Property for item's image URL.</summary>
+        /// <summary>
+        /// Property for item's image URL.
+        /// </summary>
         public string ItemImageURL;
-        /// <summary>Property for item description.</summary>
+        /// <summary>
+        /// Property for item description.
+        /// </summary>
         public string ItemDescription;
-        /// <summary>Property for whether this purchase supports the channel or not.</summary>
+        /// <summary>
+        /// Property for whether this purchase supports the channel or not.
+        /// </summary>
         public bool SupportsChannel;
-        /// <summary>Property for accompanying chat message.</summary>
+        /// <summary>
+        /// Property for accompanying chat message.
+        /// </summary>
         public string PurchaseMessage;
     }
 }

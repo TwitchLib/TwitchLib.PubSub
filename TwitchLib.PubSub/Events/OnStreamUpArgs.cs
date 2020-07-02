@@ -1,11 +1,20 @@
-﻿namespace TwitchLib.PubSub.Events
+﻿using System;
+
+namespace TwitchLib.PubSub.Events
 {
-    /// <summary>Class representing when a stream starts event.</summary>
-    public class OnStreamUpArgs
+    /// <inheritdoc />
+    /// <summary>
+    /// Class representing when a stream starts event.
+    /// </summary>
+    public class OnStreamUpArgs : EventArgs
     {
-        /// <summary>Property representing the server time.</summary>
+        /// <summary>
+        /// Property representing the server time.
+        /// </summary>
         public string ServerTime;
-        /// <summary>Property representing play delay.</summary>
+        /// <summary>
+        /// Property representing play delay.
+        /// </summary>
         public int PlayDelay;
     }
 }

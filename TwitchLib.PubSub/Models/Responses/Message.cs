@@ -3,15 +3,25 @@ using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Models.Responses
 {
-    /// <summary>PubSub Message model.</summary>
+    /// <summary>
+    /// PubSub Message model.
+    /// </summary>
     public class Message
     {
-        /// <summary>Topic that the message is relevant to.</summary>
-        public string Topic { get; protected set; }
-        /// <summary>Model containing data of the message.</summary>
+        /// <summary>
+        /// Topic that the message is relevant to.
+        /// </summary>
+        /// <value>The topic.</value>
+        public string Topic { get; }
+        /// <summary>
+        /// Model containing data of the message.
+        /// </summary>
         public readonly MessageData MessageData;
 
-        /// <summary>PubSub Message model constructor.</summary>
+        /// <summary>
+        /// PubSub Message model constructor.
+        /// </summary>
+        /// <param name="jsonStr">The json string.</param>
         public Message(string jsonStr)
         {
             var json = JObject.Parse(jsonStr).SelectToken("data");
@@ -39,6 +49,15 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "following":
                     MessageData = new Following(encodedJsonMessage);
+                    break;
+                case "community-points-channel-v1":
+                    MessageData = new CommunityPointsChannel(encodedJsonMessage);
+                    break;
+                case "leaderboard-events-v1":
+                    MessageData = new LeaderboardEvents(encodedJsonMessage);
+                    break;
+                case "raid":
+                    MessageData = new RaidEvents(encodedJsonMessage);
                     break;
             }
         }
