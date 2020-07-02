@@ -16,6 +16,10 @@
         /// <summary>
         /// On view count
         /// </summary>
-        ViewCount
+        ViewCount,
+        /// <summary>
+        /// On commercial
+        /// </summary>
+        Commercial
     }
 }

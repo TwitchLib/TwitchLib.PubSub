@@ -31,6 +31,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// </summary>
         /// <value>The viewers.</value>
         public int Viewers { get; }
+        /// <summary>
+        /// Gets the length.
+        /// </summary>
+        /// <value>The length.</value>
+        public int Length { get; }
 
         /// <summary>
         /// VideoPlayback constructor.
@@ -50,6 +55,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 case "viewcount":
                     Type = VideoPlaybackType.ViewCount;
                     break;
+                case "commercial":
+                    Type = VideoPlaybackType.Commercial;
+                    break;
             }
             ServerTime = json.SelectToken("server_time")?.ToString();
             switch (Type)
@@ -61,6 +69,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Viewers = int.Parse(json.SelectToken("viewers").ToString());
                     break;
                 case VideoPlaybackType.StreamDown:
+                    break;
+                case VideoPlaybackType.Commercial:
+                    Length = int.Parse(json.SelectToken("length").ToString());
                     break;
             }
         }
