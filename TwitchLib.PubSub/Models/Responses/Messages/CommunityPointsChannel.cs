@@ -99,7 +99,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     ChannelId = json.SelectToken("data.redemption.channel_id").ToString();
                     Login = json.SelectToken("data.redemption.user.login").ToString();
                     DisplayName = json.SelectToken("data.redemption.user.display_name").ToString();
-                    RewardId = Guid.Parse(json.SelectToken("data.redemption.id").ToString());
+                    RewardId = Guid.Parse(json.SelectToken("data.redemption.reward.id").ToString());
                     RewardTitle = json.SelectToken("data.redemption.reward.title").ToString();
                     RewardPrompt = json.SelectToken("data.redemption.reward.prompt").ToString();
                     RewardCost = int.Parse(json.SelectToken("data.redemption.reward.cost").ToString());
