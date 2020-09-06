@@ -157,17 +157,14 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 Months = int.Parse(monthsToken.ToString());
             }
-
-            // these properties are hyphenated unlike all others
-            var cumulativeMonthsToken = message.SelectToken("cumulative-months");
-
+            
+            var cumulativeMonthsToken = message.SelectToken("cumulative_months");
             if (cumulativeMonthsToken != null)
             {
                 CumulativeMonths = int.Parse(cumulativeMonthsToken.ToString());
             }
-            
-            var streakMonthsToken = message.SelectToken("streak-months");
 
+            var streakMonthsToken = message.SelectToken("streak_months");
             if (streakMonthsToken != null)
             {
                 StreakMonths = int.Parse(streakMonthsToken.ToString());
