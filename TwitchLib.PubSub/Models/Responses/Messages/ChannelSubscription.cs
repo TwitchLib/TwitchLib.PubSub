@@ -157,8 +157,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 Months = int.Parse(monthsToken.ToString());
             }
-
-            // these properties are hyphenated unlike all others
+            
             var cumulativeMonthsToken = message.SelectToken("cumulative_months");
             if (cumulativeMonthsToken != null)
             {
