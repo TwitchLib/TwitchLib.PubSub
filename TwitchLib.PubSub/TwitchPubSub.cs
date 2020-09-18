@@ -17,7 +17,7 @@ using TwitchLib.PubSub.Models.Responses.Messages;
 namespace TwitchLib.PubSub
 {
     /// <summary>
-    /// Class represneting interactions with the Twitch PubSub
+    /// Class representing interactions with the Twitch PubSub
     /// Implements the <see cref="ITwitchPubSub" />
     /// </summary>
     /// <seealso cref="ITwitchPubSub" />
