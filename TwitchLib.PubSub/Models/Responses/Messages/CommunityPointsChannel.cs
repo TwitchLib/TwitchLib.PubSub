@@ -91,7 +91,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     break;
                 default:                                    //Unknown type ignore.
                 case "redemption-status-update":            //Unimplemeted type - Used to singal change in state of RewardRedeemed.
-                case "update-redemption-statuses-progress": //Unimplemeted type - Used to single change in state of remain RewardRedeemed.
+                case "update-redemption-statuses-progress": //Unimplemeted type - Used to single change in state of remaining RewardRedeemed.
                     Type = (CommunityPointsChannelType)(-1);
                     break;
             }

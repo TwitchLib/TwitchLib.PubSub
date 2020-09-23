@@ -50,9 +50,9 @@ namespace TwitchLib.PubSub
         /// </summary>
         private readonly Timer _pongTimer = new Timer();
         /// <summary>
-        /// The pong recivied
+        /// The pong received
         /// </summary>
-        private bool _pongRecivied = false;
+        private bool _pongReceived = false;
         /// <summary>
         /// The topic list
         /// </summary>
@@ -321,7 +321,7 @@ namespace TwitchLib.PubSub
         private void PingTimerTick(object sender, ElapsedEventArgs e)
         {
             //Reset pong state.
-            _pongRecivied = false;
+            _pongReceived = false;
 
             //Send ping.
             var data = new JObject(
@@ -343,13 +343,14 @@ namespace TwitchLib.PubSub
             //Stop the pong timer.
             _pongTimer.Stop();
 
-            if (_pongRecivied)
+            if (_pongReceived)
             {
                 //If we recivied a pong we're good.
-                _pongRecivied = false;
+                _pongReceived = false;
             }
             else
             {
+                //Otherwise we're disconnected.
                 OnDisconnected();
             }
         }
@@ -574,11 +575,9 @@ namespace TwitchLib.PubSub
                             return;
                     }
                     break;
-
                 case "pong":
-                    _pongRecivied = true; 
+                    _pongReceived = true; 
                     return;
-
                 case "reconnect": OnDisconnected(); break;
             }
             UnaccountedFor(message);
