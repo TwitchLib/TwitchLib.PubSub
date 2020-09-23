@@ -578,6 +578,8 @@ namespace TwitchLib.PubSub
                 case "pong":
                     _pongRecivied = true; 
                     return;
+
+                case "reconnect": OnDisconnected(); break;
             }
             UnaccountedFor(message);
         }
