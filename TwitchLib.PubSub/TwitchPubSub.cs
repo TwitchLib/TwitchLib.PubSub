@@ -46,6 +46,14 @@ namespace TwitchLib.PubSub
         /// </summary>
         private readonly Timer _pingTimer = new Timer();
         /// <summary>
+        /// The pong timer
+        /// </summary>
+        private readonly Timer _pongTimer = new Timer();
+        /// <summary>
+        /// The pong recivied
+        /// </summary>
+        private bool _pongRecivied = false;
+        /// <summary>
         /// The topic list
         /// </summary>
         private readonly List<string> _topicList = new List<string>();
@@ -254,8 +262,11 @@ namespace TwitchLib.PubSub
 
             _socket.OnConnected += Socket_OnConnected;
             _socket.OnError += OnError;
-            _socket.OnMessage += OnMessage; ;
+            _socket.OnMessage += OnMessage;
             _socket.OnDisconnected += Socket_OnDisconnected;
+
+            _pongTimer.Interval = 15000; //15 seconds, we should get a pong back within 10 seconds.
+            _pongTimer.Elapsed += PongTimerTick;
         }
 
         /// <summary>
@@ -286,12 +297,7 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Socket_OnDisconnected(object sender, EventArgs e)
-        {
-            _logger?.LogWarning("PubSub Websocket connection closed");
-            _pingTimer.Stop();
-            OnPubSubServiceClosed?.Invoke(this, null);
-        }
+        private void Socket_OnDisconnected(object sender, EventArgs e) => OnDisconnected();
 
         /// <summary>
         /// Handles the OnConnected event of the Socket control.
@@ -314,10 +320,38 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
         private void PingTimerTick(object sender, ElapsedEventArgs e)
         {
+            //Reset pong state.
+            _pongRecivied = false;
+
+            //Send ping.
             var data = new JObject(
                 new JProperty("type", "PING")
             );
             _socket.Send(data.ToString());
+
+            //Start pong timer.
+            _pongTimer.Start();
+        }
+
+        /// <summary>
+        /// Pongs the timer tick.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
+        private void PongTimerTick(object sender, ElapsedEventArgs e)
+        {
+            //Stop the pong timer.
+            _pongTimer.Stop();
+
+            if (_pongRecivied)
+            {
+                //If we recivied a pong we're good.
+                _pongRecivied = false;
+            }
+            else
+            {
+                OnDisconnected();
+            }
         }
 
         /// <summary>
@@ -540,6 +574,10 @@ namespace TwitchLib.PubSub
                             return;
                     }
                     break;
+
+                case "pong":
+                    _pongRecivied = true; 
+                    return;
             }
             UnaccountedFor(message);
         }
@@ -577,6 +615,17 @@ namespace TwitchLib.PubSub
             {
                 _topicList.Add(topic);
             }
+        }
+
+        /// <summary>
+        /// Called when disconnected
+        /// </summary>
+        private void OnDisconnected()
+        {
+            _logger?.LogWarning("PubSub Websocket connection closed");
+            _pingTimer.Stop();
+            _pongTimer.Stop();
+            OnPubSubServiceClosed?.Invoke(this, null);
         }
 
         /// <inheritdoc />
