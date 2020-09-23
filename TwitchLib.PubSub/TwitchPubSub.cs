@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
@@ -13,6 +14,7 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
 {
@@ -31,6 +33,10 @@ namespace TwitchLib.PubSub
         /// The previous requests
         /// </summary>
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
+        /// <summary>
+        /// The previous requests semaphore
+        /// </summary>
+        private readonly Semaphore _previousRequestsSemaphore = new Semaphore(1, 1);
         /// <summary>
         /// The logger
         /// </summary>
@@ -328,16 +334,24 @@ namespace TwitchLib.PubSub
                     var resp = new Models.Responses.Response(message);
                     if (_previousRequests.Count != 0)
                     {
-                        bool handled = false;
-                        foreach (var request in _previousRequests)
+                        _previousRequestsSemaphore.WaitOne();
+                        try
                         {
-                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                            foreach (var request in _previousRequests)
                             {
-                                OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
-                                handled = true;
+                                if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                                {
+                                    //Remove the request.
+                                    _previousRequests.Remove(request);
+                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                    return;
+                                }
                             }
                         }
-                        if (handled) return;
+                        finally
+                        {
+                            _previousRequestsSemaphore.Release();
+                        }
                     }
                     break;
                 case "message":
@@ -581,10 +595,18 @@ namespace TwitchLib.PubSub
             var nonce = GenerateNonce();
 
             var topics = new JArray();
-            foreach (var val in _topicList)
+            _previousRequestsSemaphore.WaitOne();
+            try
             {
-                _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
-                topics.Add(new JValue(val));
+                foreach (var val in _topicList)
+                {
+                    _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
+                    topics.Add(new JValue(val));
+                }
+            }
+            finally
+            {
+                _previousRequestsSemaphore.Release();
             }
 
             var jsonData = new JObject(
