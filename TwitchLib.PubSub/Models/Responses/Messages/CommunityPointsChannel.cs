@@ -89,6 +89,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 case "custom-reward-deleted":
                     Type = CommunityPointsChannelType.CustomRewardDeleted;
                     break;
+                default:                                    //Unknown type ignore.
+                case "redemption-status-update":            //Unimplemeted type - Used to singal change in state of RewardRedeemed.
+                case "update-redemption-statuses-progress": //Unimplemeted type - Used to single change in state of remain RewardRedeemed.
+                    Type = (CommunityPointsChannelType)(-1);
+                    break;
             }
 
             TimeStamp = DateTime.Parse(json.SelectToken("data.timestamp").ToString());
