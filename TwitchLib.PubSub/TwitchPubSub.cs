@@ -369,17 +369,23 @@ namespace TwitchLib.PubSub
                     var resp = new Models.Responses.Response(message);
                     if (_previousRequests.Count != 0)
                     {
+                        bool handled = false;
                         _previousRequestsSemaphore.WaitOne();
                         try
                         {
-                            foreach (var request in _previousRequests)
+                            for (int i = 0; i < _previousRequests.Count;)
                             {
+                                var request = _previousRequests[i];
                                 if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
                                 {
                                     //Remove the request.
-                                    _previousRequests.Remove(request);
+                                    _previousRequests.RemoveAt(i);
                                     OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
-                                    return;
+                                    handled = true;
+                                }
+                                else
+                                {
+                                    i++;
                                 }
                             }
                         }
@@ -387,6 +393,7 @@ namespace TwitchLib.PubSub
                         {
                             _previousRequestsSemaphore.Release();
                         }
+                        if (handled) return;
                     }
                     break;
                 case "message":
