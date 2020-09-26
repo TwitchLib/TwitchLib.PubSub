@@ -297,7 +297,13 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Socket_OnDisconnected(object sender, EventArgs e) => OnDisconnected();
+        private void Socket_OnDisconnected(object sender, EventArgs e)
+        {
+            _logger?.LogWarning("PubSub Websocket connection closed");
+            _pingTimer.Stop();
+            _pongTimer.Stop();
+            OnPubSubServiceClosed?.Invoke(this, null);
+        }
 
         /// <summary>
         /// Handles the OnConnected event of the Socket control.
@@ -350,8 +356,8 @@ namespace TwitchLib.PubSub
             }
             else
             {
-                //Otherwise we're disconnected.
-                OnDisconnected();
+                //Otherwise we're disconnected so close the socket.
+                _socket.Close();
             }
         }
 
@@ -585,7 +591,7 @@ namespace TwitchLib.PubSub
                 case "pong":
                     _pongReceived = true; 
                     return;
-                case "reconnect": OnDisconnected(); break;
+                case "reconnect": _socket.Close(); break;
             }
             UnaccountedFor(message);
         }
@@ -623,17 +629,6 @@ namespace TwitchLib.PubSub
             {
                 _topicList.Add(topic);
             }
-        }
-
-        /// <summary>
-        /// Called when disconnected
-        /// </summary>
-        private void OnDisconnected()
-        {
-            _logger?.LogWarning("PubSub Websocket connection closed");
-            _pingTimer.Stop();
-            _pongTimer.Stop();
-            OnPubSubServiceClosed?.Invoke(this, null);
         }
 
         /// <inheritdoc />
