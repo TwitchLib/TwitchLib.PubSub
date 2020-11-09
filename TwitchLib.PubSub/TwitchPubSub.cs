@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
@@ -13,6 +14,7 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
 {
@@ -32,6 +34,10 @@ namespace TwitchLib.PubSub
         /// </summary>
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
         /// <summary>
+        /// The previous requests semaphore
+        /// </summary>
+        private readonly Semaphore _previousRequestsSemaphore = new Semaphore(1, 1);
+        /// <summary>
         /// The logger
         /// </summary>
         private readonly ILogger<TwitchPubSub> _logger;
@@ -39,6 +45,14 @@ namespace TwitchLib.PubSub
         /// The ping timer
         /// </summary>
         private readonly Timer _pingTimer = new Timer();
+        /// <summary>
+        /// The pong timer
+        /// </summary>
+        private readonly Timer _pongTimer = new Timer();
+        /// <summary>
+        /// The pong received
+        /// </summary>
+        private bool _pongReceived = false;
         /// <summary>
         /// The topic list
         /// </summary>
@@ -248,8 +262,11 @@ namespace TwitchLib.PubSub
 
             _socket.OnConnected += Socket_OnConnected;
             _socket.OnError += OnError;
-            _socket.OnMessage += OnMessage; ;
+            _socket.OnMessage += OnMessage;
             _socket.OnDisconnected += Socket_OnDisconnected;
+
+            _pongTimer.Interval = 15000; //15 seconds, we should get a pong back within 10 seconds.
+            _pongTimer.Elapsed += PongTimerTick;
         }
 
         /// <summary>
@@ -284,6 +301,7 @@ namespace TwitchLib.PubSub
         {
             _logger?.LogWarning("PubSub Websocket connection closed");
             _pingTimer.Stop();
+            _pongTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
         }
 
@@ -308,10 +326,39 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
         private void PingTimerTick(object sender, ElapsedEventArgs e)
         {
+            //Reset pong state.
+            _pongReceived = false;
+
+            //Send ping.
             var data = new JObject(
                 new JProperty("type", "PING")
             );
             _socket.Send(data.ToString());
+
+            //Start pong timer.
+            _pongTimer.Start();
+        }
+
+        /// <summary>
+        /// Pongs the timer tick.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
+        private void PongTimerTick(object sender, ElapsedEventArgs e)
+        {
+            //Stop the pong timer.
+            _pongTimer.Stop();
+
+            if (_pongReceived)
+            {
+                //If we recivied a pong we're good.
+                _pongReceived = false;
+            }
+            else
+            {
+                //Otherwise we're disconnected so close the socket.
+                _socket.Close();
+            }
         }
 
         /// <summary>
@@ -329,13 +376,28 @@ namespace TwitchLib.PubSub
                     if (_previousRequests.Count != 0)
                     {
                         bool handled = false;
-                        foreach (var request in _previousRequests)
+                        _previousRequestsSemaphore.WaitOne();
+                        try
                         {
-                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                            for (int i = 0; i < _previousRequests.Count;)
                             {
-                                OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
-                                handled = true;
+                                var request = _previousRequests[i];
+                                if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                                {
+                                    //Remove the request.
+                                    _previousRequests.RemoveAt(i);
+                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                    handled = true;
+                                }
+                                else
+                                {
+                                    i++;
+                                }
                             }
+                        }
+                        finally
+                        {
+                            _previousRequestsSemaphore.Release();
                         }
                         if (handled) return;
                     }
@@ -526,6 +588,10 @@ namespace TwitchLib.PubSub
                             return;
                     }
                     break;
+                case "pong":
+                    _pongReceived = true; 
+                    return;
+                case "reconnect": _socket.Close(); break;
             }
             UnaccountedFor(message);
         }
@@ -581,10 +647,18 @@ namespace TwitchLib.PubSub
             var nonce = GenerateNonce();
 
             var topics = new JArray();
-            foreach (var val in _topicList)
+            _previousRequestsSemaphore.WaitOne();
+            try
             {
-                _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
-                topics.Add(new JValue(val));
+                foreach (var val in _topicList)
+                {
+                    _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
+                    topics.Add(new JValue(val));
+                }
+            }
+            finally
+            {
+                _previousRequestsSemaphore.Release();
             }
 
             var jsonData = new JObject(
