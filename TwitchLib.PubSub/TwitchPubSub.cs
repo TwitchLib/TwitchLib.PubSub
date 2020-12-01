@@ -757,7 +757,7 @@ namespace TwitchLib.PubSub
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
         /// <param name="channelName">Name of channel to listen to playback events in.</param>
-        public void ListenToVideoPlayback(string channelID)
+        public void ListenToVideoPlayback(string channelTwitchId)
         {
             var topic = $"video-playback-by-id.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
