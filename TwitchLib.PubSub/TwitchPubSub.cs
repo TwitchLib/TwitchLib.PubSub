@@ -518,7 +518,7 @@ namespace TwitchLib.PubSub
                             var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
                             return;
-                        case "video-playback-by-id":":
+                        case "video-playback-by-id":
                             var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
                             {
