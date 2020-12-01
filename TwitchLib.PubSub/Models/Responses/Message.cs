@@ -35,7 +35,7 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "channel-bits-events-v1":
                     MessageData = new ChannelBitsEvents(encodedJsonMessage);
                     break;
-                case "video-playback":
+                case "video-playback-by-id":
                     MessageData = new VideoPlayback(encodedJsonMessage);
                     break;
                 case "whispers":
