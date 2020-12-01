@@ -518,7 +518,7 @@ namespace TwitchLib.PubSub
                             var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
                             return;
-                        case "video-playback":
+                        case "video-playback-by-id":
                             var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
                             {
@@ -757,9 +757,9 @@ namespace TwitchLib.PubSub
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
         /// <param name="channelName">Name of channel to listen to playback events in.</param>
-        public void ListenToVideoPlayback(string channelName)
+        public void ListenToVideoPlayback(string channelID)
         {
-            ListenToTopic($"video-playback.{channelName}");
+            ListenToTopic($"video-playback-by-id.{channelID}");
         }
 
         /// <inheritdoc />
