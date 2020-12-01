@@ -759,7 +759,9 @@ namespace TwitchLib.PubSub
         /// <param name="channelName">Name of channel to listen to playback events in.</param>
         public void ListenToVideoPlayback(string channelID)
         {
-            ListenToTopic($"video-playback-by-id.{channelID}");
+            var topic = $"video-playback-by-id.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <inheritdoc />
