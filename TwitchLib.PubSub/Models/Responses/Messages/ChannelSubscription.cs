@@ -91,6 +91,16 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// </summary>
         /// <value>The sub message.</value>
         public SubMessage SubMessage { get; }
+        /// <summary>
+        /// Gets or sets true if gifted.
+        /// </summary>
+        /// <value>Boolean of gifted.</value>
+        public bool? IsGift { get; }
+        /// <summary>
+        /// Gets or sets the multi month duration.
+        /// </summary>
+        /// <value>Multi month Duration int.</value>
+        public int? MultiMonthDuration { get; }
 
         /// <summary>
         /// ChatModeratorActions model constructor.
@@ -128,6 +138,18 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             }
             SubscriptionPlanName = message.SelectToken("sub_plan_name")?.ToString();
             SubMessage = new SubMessage(message.SelectToken("sub_message"));
+
+            var isGiftToken = message.SelectToken("is_gift")?.ToString();
+            if (isGiftToken != null)
+            {
+                IsGift = Convert.ToBoolean(isGiftToken.ToString());
+            }
+
+            var multiMonthDurationToken = message.SelectToken("multi_month_duration")?.ToString();
+            if (multiMonthDurationToken != null)
+            {
+                MultiMonthDuration = int.Parse(multiMonthDurationToken.ToString());
+            }
             Context = message.SelectToken("context")?.ToString();
 
             var monthsToken = message.SelectToken("months");
@@ -135,16 +157,14 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 Months = int.Parse(monthsToken.ToString());
             }
-
-            // these properties are hyphenated unlike all others
-            var cumulativeMonthsToken = message.SelectToken("cumulative-months");
-            var streakMonthsToken = message.SelectToken("streak-months");
-
+            
+            var cumulativeMonthsToken = message.SelectToken("cumulative_months");
             if (cumulativeMonthsToken != null)
             {
                 CumulativeMonths = int.Parse(cumulativeMonthsToken.ToString());
             }
 
+            var streakMonthsToken = message.SelectToken("streak_months");
             if (streakMonthsToken != null)
             {
                 StreakMonths = int.Parse(streakMonthsToken.ToString());

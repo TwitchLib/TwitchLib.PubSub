@@ -113,6 +113,42 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnWhisperArgs> OnWhisper;
         /// <summary>
+        /// Occurs when [on reward created]
+        ///</summary>
+        event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
+        /// <summary>
+        /// Occurs when [on reward updated]
+        ///</summary>
+        event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
+        /// <summary>
+        /// Occurs when [on reward deleted]
+        /// </summary>
+        event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
+        /// <summary>
+        /// Occurs when [on reward redeemed]
+        /// </summary>
+        event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <summary>
+        /// Occurs when [on leaderboard subs].
+        /// </summary>
+        event EventHandler<OnLeaderboardEventArgs> OnLeaderboardSubs;
+        /// <summary>
+        /// Occurs when [on leaderboard bits].
+        /// </summary>
+        event EventHandler<OnLeaderboardEventArgs> OnLeaderboardBits;
+        /// <summary>
+        /// Occurs when [on raid update]
+        /// </summary>
+        event EventHandler<OnRaidUpdateArgs> OnRaidUpdate;
+        /// <summary>
+        /// Occurs when [on raid update v2]
+        /// </summary>
+        event EventHandler<OnRaidUpdateV2Args> OnRaidUpdateV2;
+        /// <summary>
+        /// Occurs when [on raid go]
+        /// </summary>
+        event EventHandler<OnRaidGoArgs> OnRaidGo; 
+        /// <summary>
         /// Occurs when [on log].
         /// </summary>
         event EventHandler<OnLogArgs> OnLog;
@@ -167,6 +203,21 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToWhispers(string channelTwitchId);
+        /// <summary>
+        /// Listens to rewards
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToRewards(string channelTwitchId);
+        /// <summary>
+        /// Listens to leaderboards
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToLeaderboards(string channelTwitchId);
+        /// <summary>
+        /// Listens to raids
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToRaid(string channelTwitchId);
         /// <summary>
         /// Sends the topics.
         /// </summary>

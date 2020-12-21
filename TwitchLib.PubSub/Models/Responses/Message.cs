@@ -35,7 +35,7 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "channel-bits-events-v1":
                     MessageData = new ChannelBitsEvents(encodedJsonMessage);
                     break;
-                case "video-playback":
+                case "video-playback-by-id":
                     MessageData = new VideoPlayback(encodedJsonMessage);
                     break;
                 case "whispers":
@@ -49,6 +49,15 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "following":
                     MessageData = new Following(encodedJsonMessage);
+                    break;
+                case "community-points-channel-v1":
+                    MessageData = new CommunityPointsChannel(encodedJsonMessage);
+                    break;
+                case "leaderboard-events-v1":
+                    MessageData = new LeaderboardEvents(encodedJsonMessage);
+                    break;
+                case "raid":
+                    MessageData = new RaidEvents(encodedJsonMessage);
                     break;
             }
         }
