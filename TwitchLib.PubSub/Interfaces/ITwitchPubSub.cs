@@ -151,7 +151,11 @@ namespace TwitchLib.PubSub.Interfaces
         /// <summary>
         /// Occurs when [on log].
         /// </summary>
-        event EventHandler<OnLogArgs> OnLog;
+        event EventHandler<OnLogArgs> OnLog;        
+        /// <summary>
+        /// Occurs when [on prediction].
+        /// </summary>
+        event EventHandler<OnPredictionArgs> OnPrediction;
 
         /// <summary>
         /// Connects this instance.
@@ -218,6 +222,11 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToRaid(string channelTwitchId);
+        /// <summary>
+        /// Listens to predictions
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToPredictions(string channelTwitchId);
         /// <summary>
         /// Sends the topics.
         /// </summary>
