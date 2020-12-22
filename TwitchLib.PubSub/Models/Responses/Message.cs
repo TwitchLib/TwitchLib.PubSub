@@ -58,6 +58,9 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "raid":
                     MessageData = new RaidEvents(encodedJsonMessage);
+                    break;                
+                case "predictions-channel-v1":
+                    MessageData = new PredictionEvents(encodedJsonMessage);
                     break;
             }
         }

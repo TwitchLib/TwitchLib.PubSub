@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Enums;
+using TwitchLib.PubSub.Extensions;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
 {
@@ -80,12 +81,12 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             var eventData = json.SelectToken("data.event");
             Id = Guid.Parse(eventData.SelectToken("id").ToString());
             ChannelId = eventData.SelectToken("channel_id").ToString();
-            CreatedAt = (eventData.SelectToken("created_at") == null) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("created_at").ToString());
-            EndedAt = (eventData.SelectToken("ended_at") == null) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("ended_at").ToString());
-            LockedAt = (eventData.SelectToken("locked_at") == null) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("locked_at").ToString());
+            CreatedAt = (eventData.SelectToken("created_at").IsEmpty()) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("created_at").ToString());
+            EndedAt = (eventData.SelectToken("ended_at").IsEmpty()) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("ended_at").ToString());
+            LockedAt = (eventData.SelectToken("locked_at").IsEmpty()) ? (DateTime?) null : DateTime.Parse(eventData.SelectToken("locked_at").ToString());
             Status = (PredictionStatus) Enum.Parse(typeof(PredictionStatus), eventData.SelectToken("status").ToString().Replace("_", ""), true);
             Title = eventData.SelectToken("title").ToString();
-            WinningOutcomeId = (eventData.SelectToken("winning_outcome_id") == null) ? (Guid?) null : Guid.Parse(eventData.SelectToken("winning_outcome_id").ToString());
+            WinningOutcomeId = (eventData.SelectToken("winning_outcome_id").IsEmpty()) ? (Guid?) null : Guid.Parse(eventData.SelectToken("winning_outcome_id").ToString());
             PredictionTime = int.Parse(eventData.SelectToken("prediction_window_seconds").ToString());
 
             foreach (JToken outcome in eventData.SelectToken("outcomes").Children())
