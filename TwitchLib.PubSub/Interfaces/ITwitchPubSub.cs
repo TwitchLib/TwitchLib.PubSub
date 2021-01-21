@@ -151,7 +151,11 @@ namespace TwitchLib.PubSub.Interfaces
         /// <summary>
         /// Occurs when [on log].
         /// </summary>
-        event EventHandler<OnLogArgs> OnLog;        
+        event EventHandler<OnLogArgs> OnLog;
+        /// <summary>
+        /// Occurs when [on commercial].
+        /// </summary>
+        event EventHandler<OnCommercialArgs> OnCommercial;
         /// <summary>
         /// Occurs when [on prediction].
         /// </summary>
