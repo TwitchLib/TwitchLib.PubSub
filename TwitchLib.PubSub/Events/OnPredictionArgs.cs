@@ -12,6 +12,11 @@ namespace TwitchLib.PubSub.Events
     public class OnPredictionArgs : EventArgs
     {
         /// <summary>
+        /// Property representing the the prediction type
+        /// </summary>
+        public PredictionType Type;
+
+        /// <summary>
         /// Property representing the the prediction Id
         /// </summary>
         public Guid Id;
