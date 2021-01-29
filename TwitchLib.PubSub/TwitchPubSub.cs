@@ -3,6 +3,8 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Timers;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
@@ -13,6 +15,7 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
 {
@@ -32,6 +35,10 @@ namespace TwitchLib.PubSub
         /// </summary>
         private readonly List<PreviousRequest> _previousRequests = new List<PreviousRequest>();
         /// <summary>
+        /// The previous requests semaphore
+        /// </summary>
+        private readonly Semaphore _previousRequestsSemaphore = new Semaphore(1, 1);
+        /// <summary>
         /// The logger
         /// </summary>
         private readonly ILogger<TwitchPubSub> _logger;
@@ -39,6 +46,14 @@ namespace TwitchLib.PubSub
         /// The ping timer
         /// </summary>
         private readonly Timer _pingTimer = new Timer();
+        /// <summary>
+        /// The pong timer
+        /// </summary>
+        private readonly Timer _pongTimer = new Timer();
+        /// <summary>
+        /// The pong received
+        /// </summary>
+        private bool _pongReceived = false;
         /// <summary>
         /// The topic list
         /// </summary>
@@ -233,6 +248,11 @@ namespace TwitchLib.PubSub
         /// Fires when PubSub receives notice that the stream is playing a commercial.
         /// </summary>
         public event EventHandler<OnCommercialArgs> OnCommercial;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when PubSub receives notice that a prediction has started or updated.
+        /// </summary>
+        public event EventHandler<OnPredictionArgs> OnPrediction;
         #endregion
 
         /// <summary>
@@ -248,8 +268,11 @@ namespace TwitchLib.PubSub
 
             _socket.OnConnected += Socket_OnConnected;
             _socket.OnError += OnError;
-            _socket.OnMessage += OnMessage; ;
+            _socket.OnMessage += OnMessage;
             _socket.OnDisconnected += Socket_OnDisconnected;
+
+            _pongTimer.Interval = 15000; //15 seconds, we should get a pong back within 10 seconds.
+            _pongTimer.Elapsed += PongTimerTick;
         }
 
         /// <summary>
@@ -284,6 +307,7 @@ namespace TwitchLib.PubSub
         {
             _logger?.LogWarning("PubSub Websocket connection closed");
             _pingTimer.Stop();
+            _pongTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
         }
 
@@ -308,10 +332,39 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
         private void PingTimerTick(object sender, ElapsedEventArgs e)
         {
+            //Reset pong state.
+            _pongReceived = false;
+
+            //Send ping.
             var data = new JObject(
                 new JProperty("type", "PING")
             );
             _socket.Send(data.ToString());
+
+            //Start pong timer.
+            _pongTimer.Start();
+        }
+
+        /// <summary>
+        /// Pongs the timer tick.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
+        private void PongTimerTick(object sender, ElapsedEventArgs e)
+        {
+            //Stop the pong timer.
+            _pongTimer.Stop();
+
+            if (_pongReceived)
+            {
+                //If we recivied a pong we're good.
+                _pongReceived = false;
+            }
+            else
+            {
+                //Otherwise we're disconnected so close the socket.
+                _socket.Close();
+            }
         }
 
         /// <summary>
@@ -329,13 +382,28 @@ namespace TwitchLib.PubSub
                     if (_previousRequests.Count != 0)
                     {
                         bool handled = false;
-                        foreach (var request in _previousRequests)
+                        _previousRequestsSemaphore.WaitOne();
+                        try
                         {
-                            if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                            for (int i = 0; i < _previousRequests.Count;)
                             {
-                                OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
-                                handled = true;
+                                var request = _previousRequests[i];
+                                if (string.Equals(request.Nonce, resp.Nonce, StringComparison.CurrentCulture))
+                                {
+                                    //Remove the request.
+                                    _previousRequests.RemoveAt(i);
+                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                    handled = true;
+                                }
+                                else
+                                {
+                                    i++;
+                                }
                             }
+                        }
+                        finally
+                        {
+                            _previousRequestsSemaphore.Release();
                         }
                         if (handled) return;
                     }
@@ -456,7 +524,7 @@ namespace TwitchLib.PubSub
                             var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
                             return;
-                        case "video-playback":
+                        case "video-playback-by-id":
                             var vP = msg.MessageData as VideoPlayback;
                             switch (vP?.Type)
                             {
@@ -475,7 +543,7 @@ namespace TwitchLib.PubSub
                             }
                             break;
                         case "following":
-                            var f = (Following) msg.MessageData;
+                            var f = (Following)msg.MessageData;
                             f.FollowedChannelId = msg.Topic.Split('.')[1];
                             OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
                             return;
@@ -484,10 +552,10 @@ namespace TwitchLib.PubSub
                             switch (cpc?.Type)
                             {
                                 case CommunityPointsChannelType.RewardRedeemed:
-                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost, Status = cpc.Status });
+                                    OnRewardRedeemed?.Invoke(this, new OnRewardRedeemedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, Login = cpc.Login, DisplayName = cpc.DisplayName, Message = cpc.Message, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost, Status = cpc.Status, RedemptionId = cpc.RedemptionId });
                                     return;
                                 case CommunityPointsChannelType.CustomRewardUpdated:
-                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, ChannelId =  cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
+                                    OnCustomRewardUpdated?.Invoke(this, new OnCustomRewardUpdatedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
                                     return;
                                 case CommunityPointsChannelType.CustomRewardCreated:
                                     OnCustomRewardCreated?.Invoke(this, new OnCustomRewardCreatedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt, RewardCost = cpc.RewardCost });
@@ -514,18 +582,34 @@ namespace TwitchLib.PubSub
                             switch (r?.Type)
                             {
                                 case RaidType.RaidUpdate:
-                                    OnRaidUpdate?.Invoke(this, new OnRaidUpdateArgs{ Id = r.Id, ChannelId = r.ChannelId , TargetChannelId = r.TargetChannelId, AnnounceTime = r.AnnounceTime, RaidTime = r.RaidTime, RemainingDurationSeconds = r.RemainigDurationSeconds, ViewerCount = r.ViewerCount });
+                                    OnRaidUpdate?.Invoke(this, new OnRaidUpdateArgs { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, AnnounceTime = r.AnnounceTime, RaidTime = r.RaidTime, RemainingDurationSeconds = r.RemainigDurationSeconds, ViewerCount = r.ViewerCount });
                                     return;
                                 case RaidType.RaidUpdateV2:
-                                    OnRaidUpdateV2?.Invoke(this, new OnRaidUpdateV2Args{ Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
+                                    OnRaidUpdateV2?.Invoke(this, new OnRaidUpdateV2Args { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
                                     return;
                                 case RaidType.RaidGo:
                                     OnRaidGo?.Invoke(this, new OnRaidGoArgs { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
                                     return;
                             }
                             return;
+                        case "predictions-channel-v1":
+                            var pred = msg.MessageData as PredictionEvents;
+                            switch (pred.Type)
+                            {
+                                case PredictionType.EventCreated:
+                                    OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
+                                    return;
+                                case PredictionType.EventUpdated:
+                                    OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
+                                    return;
+                            }
+                            return;
                     }
                     break;
+                case "pong":
+                    _pongReceived = true;
+                    return;
+                case "reconnect": _socket.Close(); break;
             }
             UnaccountedFor(message);
         }
@@ -581,10 +665,18 @@ namespace TwitchLib.PubSub
             var nonce = GenerateNonce();
 
             var topics = new JArray();
-            foreach (var val in _topicList)
+            _previousRequestsSemaphore.WaitOne();
+            try
             {
-                _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
-                topics.Add(new JValue(val));
+                foreach (var val in _topicList)
+                {
+                    _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
+                    topics.Add(new JValue(val));
+                }
+            }
+            finally
+            {
+                _previousRequestsSemaphore.Release();
             }
 
             var jsonData = new JObject(
@@ -682,10 +774,12 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends request to listenOn video playback events in specific channel
         /// </summary>
-        /// <param name="channelName">Name of channel to listen to playback events in.</param>
-        public void ListenToVideoPlayback(string channelName)
+        /// <param name="channelTwitchId">Id of channel to listen to playback events in.</param>
+        public void ListenToVideoPlayback(string channelTwitchId)
         {
-            ListenToTopic($"video-playback.{channelName}");
+            var topic = $"video-playback-by-id.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
         }
 
         /// <inheritdoc />
@@ -747,6 +841,18 @@ namespace TwitchLib.PubSub
         {
             var topic = $"channel-subscribe-events-v1.{channelId}";
             _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to channel predictions.
+        /// </summary>
+        /// <param name="channelTwitchId"></param>
+        public void ListenToPredictions(string channelTwitchId)
+        {
+            var topic = $"predictions-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
         #endregion

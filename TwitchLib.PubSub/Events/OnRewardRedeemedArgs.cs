@@ -29,7 +29,7 @@ namespace TwitchLib.PubSub.Events
         /// </summary>
         public string Message;
         /// <summary>
-        /// Property representing the id of the redeemed reward
+        /// Property representing the id of the redeemed custom reward
         /// </summary>
         public Guid RewardId;
         /// <summary>
@@ -48,5 +48,10 @@ namespace TwitchLib.PubSub.Events
         /// Property representing the status of the redeemed reward
         /// </summary>
         public string Status;
+
+        /// <summary>
+        /// Property representing the id of the redeemed reward
+        /// </summary
+        public Guid RedemptionId;
     }
 }

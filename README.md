@@ -67,3 +67,5 @@ namespace TwitchLibPubSubExample
     }
 }
 ```
+
+For more examples have a look at the [Example Repo](https://github.com/JayJay1989/TwitchLib.Pubsub.Example "TwitchLib Pubsub Examples Repo provided by JayJay1989") generously provided by [JayJay1989](https://github.com/JayJay1989)
