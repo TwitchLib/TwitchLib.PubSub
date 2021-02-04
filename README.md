@@ -20,14 +20,14 @@ namespace TwitchLibPubSubExample
 {
     class Program
     {
-        private TwitchPubSub client;
+        private static TwitchPubSub client;
         
         static void Main(string[] args)
         {
             Run();
         }
         
-        private void Run()
+        private static void Run()
         {
             client = new TwitchPubSub();
 
