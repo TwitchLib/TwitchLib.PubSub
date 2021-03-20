@@ -392,7 +392,8 @@ namespace TwitchLib.PubSub
                                 {
                                     //Remove the request.
                                     _previousRequests.RemoveAt(i);
-                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                    _topicToChannelId.TryGetValue(request.Topic, out var requestChannelId);
+                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful, ChannelId = requestChannelId });
                                     handled = true;
                                 }
                                 else
@@ -529,16 +530,16 @@ namespace TwitchLib.PubSub
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
-                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime });
+                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.StreamUp:
-                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime });
+                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.ViewCount:
-                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers });
+                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.Commercial:
-                                    OnCommercial?.Invoke(this, new OnCommercialArgs { ServerTime = vP.ServerTime, Length = vP.Length });
+                                    OnCommercial?.Invoke(this, new OnCommercialArgs { ServerTime = vP.ServerTime, Length = vP.Length, ChannelId = channelId });
                                     return;
                             }
                             break;
