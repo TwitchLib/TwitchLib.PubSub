@@ -28,11 +28,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <value>The channel identifier.</value>
         public string ChannelId { get; protected set; }
         /// <summary>
-        /// User id associated
-        /// </summary>
-        /// <value>The user id.</value>
-        public string UserId { get; protected set; }
-        /// <summary>
         /// Login value associated.
         /// </summary>
         /// <value>The login name.</value>
