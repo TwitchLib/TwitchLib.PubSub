@@ -28,6 +28,11 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         /// <value>The channel identifier.</value>
         public string ChannelId { get; protected set; }
         /// <summary>
+        /// User id associated
+        /// </summary>
+        /// <value>The user id.</value>
+        public string UserId { get; protected set; }
+        /// <summary>
         /// Login value associated.
         /// </summary>
         /// <value>The login name.</value>
@@ -83,6 +88,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             switch (json.SelectToken("type").ToString())
             {
                 case "reward-redeemed":
+                case "redemption-status-update":
                     Type = CommunityPointsChannelType.RewardRedeemed;
                     break;
                 case "custom-reward-created":
@@ -95,7 +101,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     Type = CommunityPointsChannelType.CustomRewardDeleted;
                     break;
                 default:                                    //Unknown type ignore.
-                case "redemption-status-update":            //Unimplemeted type - Used to singal change in state of RewardRedeemed.
                 case "update-redemption-statuses-progress": //Unimplemeted type - Used to single change in state of remaining RewardRedeemed.
                     Type = (CommunityPointsChannelType)(-1);
                     break;
