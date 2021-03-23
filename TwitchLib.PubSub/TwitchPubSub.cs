@@ -800,6 +800,7 @@ namespace TwitchLib.PubSub
         /// Sends request to listen to rewards from specific channel.
         /// </summary>
         /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        [Obsolete("This method listens to an undocumented/retired/obsolete topic. Consider using ListenToChannelPoints()", false)]
         public void ListenToRewards(string channelTwitchId)
         {
             var topic = $"community-points-channel-v1.{channelTwitchId}";
