@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Timers;
 using TwitchLib.Communication.Clients;
@@ -426,7 +425,6 @@ namespace TwitchLib.PubSub
                         case "chat_moderator_actions":
                             var cma = msg.MessageData as ChatModeratorActions;
                             var reason = "";
-                            var targetChannelId = msg.Topic.Split('.')[2];
                             switch (cma?.ModerationAction.ToLower())
                             {
                                 case "timeout":
@@ -595,7 +593,7 @@ namespace TwitchLib.PubSub
                             return;
                         case "predictions-channel-v1":
                             var pred = msg.MessageData as PredictionEvents;
-                            switch (pred.Type)
+                            switch (pred?.Type)
                             {
                                 case PredictionType.EventCreated:
                                     OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
@@ -603,6 +601,10 @@ namespace TwitchLib.PubSub
                                 case PredictionType.EventUpdated:
                                     OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
                                     return;
+                                case null:
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
                             }
                             return;
                     }
@@ -691,7 +693,7 @@ namespace TwitchLib.PubSub
                 );
             if (oauth != null)
             {
-                ((JObject)jsonData.SelectToken("data")).Add(new JProperty("auth_token", oauth));
+                ((JObject)jsonData.SelectToken("data"))?.Add(new JProperty("auth_token", oauth));
             }
 
             _socket.Send(jsonData.ToString());
