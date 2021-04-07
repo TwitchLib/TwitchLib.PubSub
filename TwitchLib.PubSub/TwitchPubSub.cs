@@ -602,9 +602,11 @@ namespace TwitchLib.PubSub
                                     OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
                                     return;
                                 case null:
+                                    UnaccountedFor("Prediction Type: null");
                                     break;
                                 default:
-                                    throw new ArgumentOutOfRangeException();
+                                    UnaccountedFor($"Prediction Type: {pred.Type}");
+                                    break;
                             }
                             return;
                     }
