@@ -3,7 +3,6 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Timers;
 using TwitchLib.Communication.Clients;
@@ -392,7 +391,8 @@ namespace TwitchLib.PubSub
                                 {
                                     //Remove the request.
                                     _previousRequests.RemoveAt(i);
-                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful });
+                                    _topicToChannelId.TryGetValue(request.Topic, out var requestChannelId);
+                                    OnListenResponse?.Invoke(this, new OnListenResponseArgs { Response = resp, Topic = request.Topic, Successful = resp.Successful, ChannelId = requestChannelId });
                                     handled = true;
                                 }
                                 else
@@ -425,7 +425,6 @@ namespace TwitchLib.PubSub
                         case "chat_moderator_actions":
                             var cma = msg.MessageData as ChatModeratorActions;
                             var reason = "";
-                            var targetChannelId = msg.Topic.Split('.')[2];
                             switch (cma?.ModerationAction.ToLower())
                             {
                                 case "timeout":
@@ -529,16 +528,16 @@ namespace TwitchLib.PubSub
                             switch (vP?.Type)
                             {
                                 case VideoPlaybackType.StreamDown:
-                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime });
+                                    OnStreamDown?.Invoke(this, new OnStreamDownArgs { ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.StreamUp:
-                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime });
+                                    OnStreamUp?.Invoke(this, new OnStreamUpArgs { PlayDelay = vP.PlayDelay, ServerTime = vP.ServerTime, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.ViewCount:
-                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers });
+                                    OnViewCount?.Invoke(this, new OnViewCountArgs { ServerTime = vP.ServerTime, Viewers = vP.Viewers, ChannelId = channelId });
                                     return;
                                 case VideoPlaybackType.Commercial:
-                                    OnCommercial?.Invoke(this, new OnCommercialArgs { ServerTime = vP.ServerTime, Length = vP.Length });
+                                    OnCommercial?.Invoke(this, new OnCommercialArgs { ServerTime = vP.ServerTime, Length = vP.Length, ChannelId = channelId });
                                     return;
                             }
                             break;
@@ -594,7 +593,7 @@ namespace TwitchLib.PubSub
                             return;
                         case "predictions-channel-v1":
                             var pred = msg.MessageData as PredictionEvents;
-                            switch (pred.Type)
+                            switch (pred?.Type)
                             {
                                 case PredictionType.EventCreated:
                                     OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
@@ -602,6 +601,12 @@ namespace TwitchLib.PubSub
                                 case PredictionType.EventUpdated:
                                     OnPrediction?.Invoke(this, new OnPredictionArgs { CreatedAt = pred.CreatedAt, Title = pred.Title, ChannelId = pred.ChannelId, EndedAt = pred.EndedAt, Id = pred.Id, Outcomes = pred.Outcomes, LockedAt = pred.LockedAt, PredictionTime = pred.PredictionTime, Status = pred.Status, WinningOutcomeId = pred.WinningOutcomeId, Type = pred.Type });
                                     return;
+                                case null:
+                                    UnaccountedFor("Prediction Type: null");
+                                    break;
+                                default:
+                                    UnaccountedFor($"Prediction Type: {pred.Type}");
+                                    break;
                             }
                             return;
                     }
@@ -690,7 +695,7 @@ namespace TwitchLib.PubSub
                 );
             if (oauth != null)
             {
-                ((JObject)jsonData.SelectToken("data")).Add(new JProperty("auth_token", oauth));
+                ((JObject)jsonData.SelectToken("data"))?.Add(new JProperty("auth_token", oauth));
             }
 
             _socket.Send(jsonData.ToString());
@@ -799,6 +804,7 @@ namespace TwitchLib.PubSub
         /// Sends request to listen to rewards from specific channel.
         /// </summary>
         /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        [Obsolete("This method listens to an undocumented/retired/obsolete topic. Consider using ListenToChannelPoints()", false)]
         public void ListenToRewards(string channelTwitchId)
         {
             var topic = $"community-points-channel-v1.{channelTwitchId}";

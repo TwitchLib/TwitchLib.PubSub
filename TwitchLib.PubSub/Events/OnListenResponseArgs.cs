@@ -21,5 +21,9 @@ namespace TwitchLib.PubSub.Events
         /// Property representing if request was successful.
         /// </summary>
         public bool Successful;
+        /// <summary>
+        /// Property representing the id of the channel the event originated from.
+        /// </summary>
+        public string ChannelId;
     }
 }

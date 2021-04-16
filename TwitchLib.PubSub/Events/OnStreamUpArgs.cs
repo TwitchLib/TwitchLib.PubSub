@@ -16,5 +16,9 @@ namespace TwitchLib.PubSub.Events
         /// Property representing play delay.
         /// </summary>
         public int PlayDelay;
+        /// <summary>
+        /// Property representing the id of the channel the event originated from.
+        /// </summary>
+        public string ChannelId;
     }
 }
