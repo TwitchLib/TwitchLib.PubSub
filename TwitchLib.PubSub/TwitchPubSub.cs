@@ -14,6 +14,7 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
@@ -195,23 +196,31 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Fires when pubsub receives notice when a custom reward has been created on the specified channel.
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
         /// <inheritdoc />
         /// <summary>
         /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
-
         /// <inheritdoc />
         /// <summary>
         /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.</summary>
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <inheritdoc />
         /// <summary>
         /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic. Consider using OnChannelPointsRewardRedeemed", false)]
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when pubsub receives a message indicating a channel points reward was redeemed.
+        /// </summary>
+        public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
         /// <inheritdoc />
         /// <summary>
         /// Fires when PubSub receives notice when the leaderboard changes for subs.
@@ -564,6 +573,19 @@ namespace TwitchLib.PubSub
                                     return;
                             }
                             return;
+                        case "channel-points-channel-v1":
+                            var channelPointsChannel = msg.MessageData as ChannelPointsChannel;
+                            switch(channelPointsChannel.Type)
+                            {
+                                case ChannelPointsChannelType.RewardRedeemed:
+                                    var rewardRedeemed = channelPointsChannel.Data as RewardRedeemed;
+                                    OnChannelPointsRewardRedeemed?.Invoke(this, new OnChannelPointsRewardRedeemedArgs { ChannelId = rewardRedeemed.Redemption.ChannelId, RewardRedeemed = rewardRedeemed });
+                                    break;
+                                case ChannelPointsChannelType.Unknown:
+                                    UnaccountedFor($"Unknown channel points type. Msg: {channelPointsChannel.RawData}");
+                                    break;
+                            }
+                            return;
                         case "leaderboard-events-v1":
                             var lbe = msg.MessageData as LeaderboardEvents;
                             switch (lbe?.Type)
@@ -808,6 +830,18 @@ namespace TwitchLib.PubSub
         public void ListenToRewards(string channelTwitchId)
         {
             var topic = $"community-points-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to channel points actions from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        public void ListenToChannelPoints(string channelTwitchId)
+        {
+            var topic = $"channel-points-channel-v1.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }

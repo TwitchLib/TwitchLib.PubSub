@@ -53,6 +53,9 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "community-points-channel-v1":
                     MessageData = new CommunityPointsChannel(encodedJsonMessage);
                     break;
+                case "channel-points-channel-v1":
+                    MessageData = new ChannelPointsChannel(encodedJsonMessage);
+                    break;
                 case "leaderboard-events-v1":
                     MessageData = new LeaderboardEvents(encodedJsonMessage);
                     break;
