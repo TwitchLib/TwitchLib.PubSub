@@ -154,6 +154,11 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives a bits message.
+        /// </summary>
+        public event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives notice of a commerce transaction.
         /// </summary>
         public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
@@ -508,6 +513,25 @@ namespace TwitchLib.PubSub
                                 return;
                             }
                             break;
+                        case "channel-bits-events-v2":
+                            if (msg.MessageData is ChannelBitsEventsV2 cbev2)
+                            {
+                                OnBitsReceivedV2?.Invoke(this, new OnBitsReceivedV2Args
+                                {
+                                    IsAnonymous = cbev2.IsAnonymous,
+                                    BitsUsed = cbev2.BitsUsed,
+                                    ChannelId = cbev2.ChannelId,
+                                    ChannelName = cbev2.ChannelName,
+                                    ChatMessage = cbev2.ChatMessage,
+                                    Context = cbev2.Context,
+                                    Time = cbev2.Time,
+                                    TotalBitsUsed = cbev2.TotalBitsUsed,
+                                    UserId = cbev2.UserId,
+                                    UserName = cbev2.UserName
+                                });
+                                return;
+                            }
+                            break;
                         case "channel-commerce-events-v1":
                             if (msg.MessageData is ChannelCommerceEvents cce)
                             {
@@ -778,9 +802,22 @@ namespace TwitchLib.PubSub
         /// Sends request to listenOn bits events in specific channel
         /// </summary>
         /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
+        [Obsolete("This topic is depreacted by Twitch. Please use ListenToBitsEventsV2()", false)]
         public void ListenToBitsEvents(string channelTwitchId)
         {
             var topic = $"channel-bits-events-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to bits events in specific channel
+        /// </summary>
+        /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
+        public void ListenToBitsEventsV2(string channelTwitchId)
+        {
+            var topic = $"channel-bits-events-v2.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
