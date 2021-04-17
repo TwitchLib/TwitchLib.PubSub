@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
 
 namespace TwitchLib.PubSub.Models.Responses
@@ -34,6 +35,11 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "channel-bits-events-v1":
                     MessageData = new ChannelBitsEvents(encodedJsonMessage);
+                    break;
+                case "channel-bits-events-v2":
+                    encodedJsonMessage = encodedJsonMessage.Replace("\\", "");
+                    var dataEncoded = JObject.Parse(encodedJsonMessage)["data"].ToString();
+                    MessageData = JsonConvert.DeserializeObject<ChannelBitsEventsV2>(dataEncoded);
                     break;
                 case "video-playback-by-id":
                     MessageData = new VideoPlayback(encodedJsonMessage);
