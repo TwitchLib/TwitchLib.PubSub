@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
 
 namespace TwitchLib.PubSub.Models.Responses
 {
@@ -30,6 +31,9 @@ namespace TwitchLib.PubSub.Models.Responses
             var encodedJsonMessage = json.SelectToken("message").ToString();
             switch (Topic?.Split('.')[0])
             {
+                case "automod-queue":
+                    MessageData = new AutomodQueue(encodedJsonMessage);
+                    break;
                 case "chat_moderator_actions":
                     MessageData = new ChatModeratorActions(encodedJsonMessage);
                     break;
