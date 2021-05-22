@@ -14,6 +14,7 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 using Timer = System.Timers.Timer;
 
@@ -266,6 +267,11 @@ namespace TwitchLib.PubSub
         /// Fires when PubSub receives notice that a prediction has started or updated.
         /// </summary>
         public event EventHandler<OnPredictionArgs> OnPrediction;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when Automod updates a held message.
+        /// </summary>
+        public event EventHandler<OnAutomodCaughtMessageArgs> OnAutomodCaughtMessage;
         #endregion
 
         /// <summary>
@@ -428,6 +434,19 @@ namespace TwitchLib.PubSub
                     channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
+                        case "automod-queue":
+                            var automodQueue = msg.MessageData as AutomodQueue;
+                            switch (automodQueue.Type)
+                            {
+                                case AutomodQueueType.CaughtMessage:
+                                    var caughtMessage = automodQueue.Data as AutomodCaughtMessage;
+                                    OnAutomodCaughtMessage?.Invoke(this, new OnAutomodCaughtMessageArgs { ChannelId = channelId, AutomodCaughtMessage = caughtMessage });
+                                    break;
+                                case AutomodQueueType.Unknown:
+                                    UnaccountedFor($"Unknown automod queue type. Msg: {automodQueue.RawData}");
+                                    break;
+                            }
+                            return;
                         case "channel-subscribe-events-v1":
                             var subscription = msg.MessageData as ChannelSubscription;
                             OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription, ChannelId = channelId });
@@ -780,6 +799,19 @@ namespace TwitchLib.PubSub
         public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
         {
             var topic = $"chat_moderator_actions.{myTwitchId}.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends a request to listen to automod queued messages in a specific channel
+        /// </summary>
+        /// <param name="userTwitchId">A moderator's twitch account's ID</param>
+        /// <param name="channelTwitchId">Channel ID who has previous paramter's moderator</param>
+        public void ListenToAutomodQueue(string userTwitchId, string channelTwitchId)
+        {
+            var topic = $"automod-queue.{userTwitchId}.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
