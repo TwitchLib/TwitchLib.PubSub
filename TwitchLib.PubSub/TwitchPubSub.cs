@@ -812,8 +812,8 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
         /// </summary>
-        /// <param name="myTwitchId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
-        /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
+        /// <param name="userId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
+        /// <param name="channelId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
         public void ListenToChatModeratorActions(string userId, string channelId)
         {
             var topic = $"chat_moderator_actions.{userId}.{channelId}";
