@@ -814,10 +814,10 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="myTwitchId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
         /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
-        public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
+        public void ListenToChatModeratorActions(string userId, string channelId)
         {
-            var topic = $"chat_moderator_actions.{myTwitchId}.{channelTwitchId}";
-            _topicToChannelId[topic] = channelTwitchId;
+            var topic = $"chat_moderator_actions.{userId}.{channelId}";
+            _topicToChannelId[topic] = channelId;
             ListenToTopic(topic);
         }
 
