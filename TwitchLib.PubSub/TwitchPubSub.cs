@@ -16,6 +16,7 @@ using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
 using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
+using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
@@ -272,6 +273,11 @@ namespace TwitchLib.PubSub
         /// Fires when Automod updates a held message.
         /// </summary>
         public event EventHandler<OnAutomodCaughtMessageArgs> OnAutomodCaughtMessage;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when a moderation event hits a user
+        /// </summary>
+        public event EventHandler<OnAutomodCaughtUserMessage> OnAutomodCaughtUserMessage;
         #endregion
 
         /// <summary>
@@ -434,6 +440,18 @@ namespace TwitchLib.PubSub
                     channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
+                        case "user-moderation-notifications":
+                            var userModerationNotifications = msg.MessageData as UserModerationNotifications;
+                            switch(userModerationNotifications.Type)
+                            {
+                                case UserModerationNotificationsType.AutomodCaughtMessage:
+                                    var automodCaughtMessage = userModerationNotifications.Data as Models.Responses.Messages.UserModerationNotificationsTypes.AutomodCaughtMessage;
+                                    OnAutomodCaughtUserMessage?.Invoke(this, new OnAutomodCaughtUserMessage { ChannelId = channelId, UserId = msg.Topic.Split('.')[2], AutomodCaughtMessage = automodCaughtMessage });
+                                    break;
+                                case UserModerationNotificationsType.Unknown:
+                                    break;
+                            }
+                            return;
                         case "automod-queue":
                             var automodQueue = msg.MessageData as AutomodQueue;
                             switch (automodQueue.Type)
@@ -794,11 +812,18 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
         /// </summary>
-        /// <param name="myTwitchId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
-        /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
-        public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
+        /// <param name="userId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
+        /// <param name="channelId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
+        public void ListenToChatModeratorActions(string userId, string channelId)
         {
-            var topic = $"chat_moderator_actions.{myTwitchId}.{channelTwitchId}";
+            var topic = $"chat_moderator_actions.{userId}.{channelId}";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
+        }
+
+        public void ListenToUserModerationNotifications(string myTwitchId, string channelTwitchId)
+        {
+            var topic = $"user-moderation-notifications.{myTwitchId}.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
