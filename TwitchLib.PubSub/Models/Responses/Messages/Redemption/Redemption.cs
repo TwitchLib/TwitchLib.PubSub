@@ -17,6 +17,8 @@ namespace TwitchLib.PubSub.Models.Responses.Messages.Redemption
         public DateTime RedeemedAt { get; protected set; }
         [JsonProperty(PropertyName = "reward")]
         public Reward Reward { get; protected set; }
+        [JsonProperty(PropertyName = "user_input")]
+        public string UserInput { get; protected set; }
         [JsonProperty(PropertyName = "status")]
         public string Status { get; protected set; }
     }
