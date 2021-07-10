@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages.Redemption
 {
@@ -22,9 +20,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages.Redemption
         [JsonProperty(PropertyName = "is_sub_only")]
         public bool IsSubOnly { get; protected set; }
         [JsonProperty(PropertyName = "image")]
-        public string Image { get; protected set; }
+        public RedemptionImage Image { get; protected set; }
         [JsonProperty(PropertyName = "default_image")]
-        public DefaultImage DefaultImage { get; protected set; }
+        public RedemptionImage DefaultImage { get; protected set; }
         [JsonProperty(PropertyName = "background_color")]
         public string BackgroundColor { get; protected set; }
         [JsonProperty(PropertyName = "is_enabled")]
