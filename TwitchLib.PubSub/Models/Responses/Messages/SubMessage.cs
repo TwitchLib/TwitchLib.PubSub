@@ -52,7 +52,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             /// Gets or sets the identifier.
             /// </summary>
             /// <value>The identifier.</value>
-            public int Id { get; }
+            public string Id { get; }
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Emote"/> class.
@@ -62,7 +62,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
             {
                 Start = int.Parse(json.SelectToken("start").ToString());
                 End = int.Parse(json.SelectToken("end").ToString());
-                Id = int.Parse(json.SelectToken("id").ToString());
+                Id = json.SelectToken("id").ToString();
             }
         }
     }
