@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 
 namespace TwitchLib.PubSub.Models.Responses.Messages
@@ -30,7 +31,16 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
         {
             Message = json.SelectToken("message")?.ToString();
             foreach (var token in json.SelectToken("emotes"))
-                Emotes.Add(new Emote(token));
+            {
+                try
+                {
+                    Emotes.Add(new Emote(token));
+                }
+                catch (Exception exc)
+                {
+                    Console.WriteLine($"Error trying to parse Emote {exc.Message}");
+                }
+            }
         }
 
         /// <summary>
