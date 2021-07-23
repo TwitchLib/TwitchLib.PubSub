@@ -22,7 +22,7 @@ using Timer = System.Timers.Timer;
 namespace TwitchLib.PubSub
 {
     /// <summary>
-    /// Class represneting interactions with the Twitch PubSub
+    /// Class representing interactions with the Twitch PubSub
     /// Implements the <see cref="ITwitchPubSub" />
     /// </summary>
     /// <seealso cref="ITwitchPubSub" />
@@ -201,30 +201,31 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a custom reward has been created on the specified channel.
+        /// Fires when PubSub receives notice when a custom reward has been created on the specified channel.
         ///</summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
+        /// Fires when PubSub receives notice when a custom reward has been changed on the specified channel.
         ///</summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.
+        /// Fires when PubSub receives notice when a reward has been deleted on the specified channel.
         /// </summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.
+        /// Fires when PubSub receives notice when a reward has been redeemed on the specified channel.
         /// </summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic. Consider using OnChannelPointsRewardRedeemed", false)]
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives a message indicating a channel points reward was redeemed.
+        /// Fires when PubSub receives a message indicating a channel points reward was redeemed.
         /// </summary>
         public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
         /// <inheritdoc />
@@ -381,7 +382,7 @@ namespace TwitchLib.PubSub
 
             if (_pongReceived)
             {
-                //If we recivied a pong we're good.
+                //If we received a pong we're good.
                 _pongReceived = false;
             }
             else
@@ -786,7 +787,7 @@ namespace TwitchLib.PubSub
         }
 
         /// <summary>
-        /// Unaccounteds for.
+        /// Unaccounted for.
         /// </summary>
         /// <param name="message">The message.</param>
         private void UnaccountedFor(string message)
@@ -811,7 +812,7 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
         /// </summary>
-        /// <param name="userId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
+        /// <param name="userId">A moderator's twitch account's ID (can be fetched from TwitchApi)</param>
         /// <param name="channelId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
         public void ListenToChatModeratorActions(string userId, string channelId)
         {
@@ -829,10 +830,10 @@ namespace TwitchLib.PubSub
 
         /// <inheritdoc />
         /// <summary>
-        /// Sends a request to listen to automod queued messages in a specific channel
+        /// Sends a request to listen to Automod queued messages in a specific channel
         /// </summary>
         /// <param name="userTwitchId">A moderator's twitch account's ID</param>
-        /// <param name="channelTwitchId">Channel ID who has previous paramter's moderator</param>
+        /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator</param>
         public void ListenToAutomodQueue(string userTwitchId, string channelTwitchId)
         {
             var topic = $"automod-queue.{userTwitchId}.{channelTwitchId}";
@@ -858,7 +859,7 @@ namespace TwitchLib.PubSub
         /// Sends request to listenOn bits events in specific channel
         /// </summary>
         /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
-        [Obsolete("This topic is depreacted by Twitch. Please use ListenToBitsEventsV2()", false)]
+        [Obsolete("This topic is deprecated by Twitch. Please use ListenToBitsEventsV2()", false)]
         public void ListenToBitsEvents(string channelTwitchId)
         {
             var topic = $"channel-bits-events-v1.{channelTwitchId}";
