@@ -213,17 +213,16 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.</summary>
+        /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.
         /// </summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
+        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.
         /// </summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic. Consider using OnChannelPointsRewardRedeemed", false)]
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
-        /// <inheritdoc />
         /// <summary>
         /// Fires when pubsub receives a message indicating a channel points reward was redeemed.
         /// </summary>
