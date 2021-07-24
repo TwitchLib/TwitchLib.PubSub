@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TwitchLib.PubSub</PackageId>
-    <VersionPrefix>3.2.2</VersionPrefix>
+    <VersionPrefix>3.2.3</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Description>PubSub component of TwitchLib. This component allows you to access Twitch's PubSub event system and subscribe/unsubscribe from topics.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -18,12 +18,13 @@
     <RepositoryType>Git</RepositoryType>
     <PackageTags>twitch library irc chat c# csharp api events pubsub net standard 2.0</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <AssemblyVersion>3.2.2</AssemblyVersion>
-    <FileVersion>3.2.2</FileVersion>
+    <AssemblyVersion>3.2.3</AssemblyVersion>
+    <FileVersion>3.2.3</FileVersion>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="TwitchLib.Communication" Version="1.0.3" />
   </ItemGroup>
 </Project>

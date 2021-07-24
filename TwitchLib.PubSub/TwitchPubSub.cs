@@ -14,6 +14,9 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
+using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
+using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 using Timer = System.Timers.Timer;
 
 namespace TwitchLib.PubSub
@@ -153,6 +156,11 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives a bits message.
+        /// </summary>
+        public event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives notice of a commerce transaction.
         /// </summary>
         public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
@@ -193,25 +201,33 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnFollowArgs> OnFollow;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a custom reward has been created on the specified channel.
+        /// Fires when PubSub receives notice when a custom reward has been created on the specified channel.
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a custom reward has been changed on the specified channel.
+        /// Fires when PubSub receives notice when a custom reward has been changed on the specified channel.
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
-
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been deleted on the specified channel.</summary>
+        /// Fires when PubSub receives notice when a reward has been deleted on the specified channel.
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         public event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when pubsub receives notice when a reward has been redeemed on the specified channel.</summary>
+        /// Fires when PubSub receives notice when a reward has been redeemed on the specified channel.
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic. Consider using OnChannelPointsRewardRedeemed", false)]
         public event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives a message indicating a channel points reward was redeemed.
+        /// </summary>
+        public event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
         /// <inheritdoc />
         /// <summary>
         /// Fires when PubSub receives notice when the leaderboard changes for subs.
@@ -252,6 +268,16 @@ namespace TwitchLib.PubSub
         /// Fires when PubSub receives notice that a prediction has started or updated.
         /// </summary>
         public event EventHandler<OnPredictionArgs> OnPrediction;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when Automod updates a held message.
+        /// </summary>
+        public event EventHandler<OnAutomodCaughtMessageArgs> OnAutomodCaughtMessage;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when a moderation event hits a user
+        /// </summary>
+        public event EventHandler<OnAutomodCaughtUserMessage> OnAutomodCaughtUserMessage;
         #endregion
 
         /// <summary>
@@ -356,7 +382,7 @@ namespace TwitchLib.PubSub
 
             if (_pongReceived)
             {
-                //If we recivied a pong we're good.
+                //If we received a pong we're good.
                 _pongReceived = false;
             }
             else
@@ -414,6 +440,31 @@ namespace TwitchLib.PubSub
                     channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
+                        case "user-moderation-notifications":
+                            var userModerationNotifications = msg.MessageData as UserModerationNotifications;
+                            switch(userModerationNotifications.Type)
+                            {
+                                case UserModerationNotificationsType.AutomodCaughtMessage:
+                                    var automodCaughtMessage = userModerationNotifications.Data as Models.Responses.Messages.UserModerationNotificationsTypes.AutomodCaughtMessage;
+                                    OnAutomodCaughtUserMessage?.Invoke(this, new OnAutomodCaughtUserMessage { ChannelId = channelId, UserId = msg.Topic.Split('.')[2], AutomodCaughtMessage = automodCaughtMessage });
+                                    break;
+                                case UserModerationNotificationsType.Unknown:
+                                    break;
+                            }
+                            return;
+                        case "automod-queue":
+                            var automodQueue = msg.MessageData as AutomodQueue;
+                            switch (automodQueue.Type)
+                            {
+                                case AutomodQueueType.CaughtMessage:
+                                    var caughtMessage = automodQueue.Data as AutomodCaughtMessage;
+                                    OnAutomodCaughtMessage?.Invoke(this, new OnAutomodCaughtMessageArgs { ChannelId = channelId, AutomodCaughtMessage = caughtMessage });
+                                    break;
+                                case AutomodQueueType.Unknown:
+                                    UnaccountedFor($"Unknown automod queue type. Msg: {automodQueue.RawData}");
+                                    break;
+                            }
+                            return;
                         case "channel-subscribe-events-v1":
                             var subscription = msg.MessageData as ChannelSubscription;
                             OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription, ChannelId = channelId });
@@ -499,6 +550,25 @@ namespace TwitchLib.PubSub
                                 return;
                             }
                             break;
+                        case "channel-bits-events-v2":
+                            if (msg.MessageData is ChannelBitsEventsV2 cbev2)
+                            {
+                                OnBitsReceivedV2?.Invoke(this, new OnBitsReceivedV2Args
+                                {
+                                    IsAnonymous = cbev2.IsAnonymous,
+                                    BitsUsed = cbev2.BitsUsed,
+                                    ChannelId = cbev2.ChannelId,
+                                    ChannelName = cbev2.ChannelName,
+                                    ChatMessage = cbev2.ChatMessage,
+                                    Context = cbev2.Context,
+                                    Time = cbev2.Time,
+                                    TotalBitsUsed = cbev2.TotalBitsUsed,
+                                    UserId = cbev2.UserId,
+                                    UserName = cbev2.UserName
+                                });
+                                return;
+                            }
+                            break;
                         case "channel-commerce-events-v1":
                             if (msg.MessageData is ChannelCommerceEvents cce)
                             {
@@ -562,6 +632,19 @@ namespace TwitchLib.PubSub
                                 case CommunityPointsChannelType.CustomRewardDeleted:
                                     OnCustomRewardDeleted?.Invoke(this, new OnCustomRewardDeletedArgs { TimeStamp = cpc.TimeStamp, ChannelId = cpc.ChannelId, RewardId = cpc.RewardId, RewardTitle = cpc.RewardTitle, RewardPrompt = cpc.RewardPrompt });
                                     return;
+                            }
+                            return;
+                        case "channel-points-channel-v1":
+                            var channelPointsChannel = msg.MessageData as ChannelPointsChannel;
+                            switch(channelPointsChannel.Type)
+                            {
+                                case ChannelPointsChannelType.RewardRedeemed:
+                                    var rewardRedeemed = channelPointsChannel.Data as RewardRedeemed;
+                                    OnChannelPointsRewardRedeemed?.Invoke(this, new OnChannelPointsRewardRedeemedArgs { ChannelId = rewardRedeemed.Redemption.ChannelId, RewardRedeemed = rewardRedeemed });
+                                    break;
+                                case ChannelPointsChannelType.Unknown:
+                                    UnaccountedFor($"Unknown channel points type. Msg: {channelPointsChannel.RawData}");
+                                    break;
                             }
                             return;
                         case "leaderboard-events-v1":
@@ -704,7 +787,7 @@ namespace TwitchLib.PubSub
         }
 
         /// <summary>
-        /// Unaccounteds for.
+        /// Unaccounted for.
         /// </summary>
         /// <param name="message">The message.</param>
         private void UnaccountedFor(string message)
@@ -729,11 +812,31 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
         /// </summary>
-        /// <param name="myTwitchId">A moderator's twitch acount's ID (can be fetched from TwitchApi)</param>
-        /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
-        public void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId)
+        /// <param name="userId">A moderator's twitch account's ID (can be fetched from TwitchApi)</param>
+        /// <param name="channelId">Channel ID who has previous parameter's moderator (can be fetched from TwitchApi)</param>
+        public void ListenToChatModeratorActions(string userId, string channelId)
         {
-            var topic = $"chat_moderator_actions.{myTwitchId}.{channelTwitchId}";
+            var topic = $"chat_moderator_actions.{userId}.{channelId}";
+            _topicToChannelId[topic] = channelId;
+            ListenToTopic(topic);
+        }
+
+        public void ListenToUserModerationNotifications(string myTwitchId, string channelTwitchId)
+        {
+            var topic = $"user-moderation-notifications.{myTwitchId}.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends a request to listen to Automod queued messages in a specific channel
+        /// </summary>
+        /// <param name="userTwitchId">A moderator's twitch account's ID</param>
+        /// <param name="channelTwitchId">Channel ID who has previous parameter's moderator</param>
+        public void ListenToAutomodQueue(string userTwitchId, string channelTwitchId)
+        {
+            var topic = $"automod-queue.{userTwitchId}.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
@@ -756,9 +859,22 @@ namespace TwitchLib.PubSub
         /// Sends request to listenOn bits events in specific channel
         /// </summary>
         /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
+        [Obsolete("This topic is deprecated by Twitch. Please use ListenToBitsEventsV2()", false)]
         public void ListenToBitsEvents(string channelTwitchId)
         {
             var topic = $"channel-bits-events-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to bits events in specific channel
+        /// </summary>
+        /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
+        public void ListenToBitsEventsV2(string channelTwitchId)
+        {
+            var topic = $"channel-bits-events-v2.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
@@ -808,6 +924,18 @@ namespace TwitchLib.PubSub
         public void ListenToRewards(string channelTwitchId)
         {
             var topic = $"community-points-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <inheritdoc />
+        /// <summary>
+        /// Sends request to listen to channel points actions from specific channel.
+        /// </summary>
+        /// <param name="channelTwitchId">Channel to listen to rewards on.</param>
+        public void ListenToChannelPoints(string channelTwitchId)
+        {
+            var topic = $"channel-points-channel-v1.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }

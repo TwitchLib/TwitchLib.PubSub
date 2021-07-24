@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
+using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 
 namespace TwitchLib.PubSub.Models.Responses
 {
@@ -29,11 +32,22 @@ namespace TwitchLib.PubSub.Models.Responses
             var encodedJsonMessage = json.SelectToken("message").ToString();
             switch (Topic?.Split('.')[0])
             {
+                case "user-moderation-notifications":
+                    MessageData = new UserModerationNotifications(encodedJsonMessage);
+                    break;
+                case "automod-queue":
+                    MessageData = new AutomodQueue(encodedJsonMessage);
+                    break;
                 case "chat_moderator_actions":
                     MessageData = new ChatModeratorActions(encodedJsonMessage);
                     break;
                 case "channel-bits-events-v1":
                     MessageData = new ChannelBitsEvents(encodedJsonMessage);
+                    break;
+                case "channel-bits-events-v2":
+                    encodedJsonMessage = encodedJsonMessage.Replace("\\", "");
+                    var dataEncoded = JObject.Parse(encodedJsonMessage)["data"].ToString();
+                    MessageData = JsonConvert.DeserializeObject<ChannelBitsEventsV2>(dataEncoded);
                     break;
                 case "video-playback-by-id":
                     MessageData = new VideoPlayback(encodedJsonMessage);
@@ -52,6 +66,9 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "community-points-channel-v1":
                     MessageData = new CommunityPointsChannel(encodedJsonMessage);
+                    break;
+                case "channel-points-channel-v1":
+                    MessageData = new ChannelPointsChannel(encodedJsonMessage);
                     break;
                 case "leaderboard-events-v1":
                     MessageData = new LeaderboardEvents(encodedJsonMessage);
