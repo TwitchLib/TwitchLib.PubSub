@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>TwitchLib.PubSub</PackageId>
-    <VersionPrefix>3.2.3</VersionPrefix>
+    <VersionPrefix>3.2.4</VersionPrefix>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Description>PubSub component of TwitchLib. This component allows you to access Twitch's PubSub event system and subscribe/unsubscribe from topics.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
