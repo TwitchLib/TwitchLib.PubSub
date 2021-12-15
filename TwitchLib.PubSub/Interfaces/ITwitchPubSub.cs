@@ -29,10 +29,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnClearArgs> OnClear;
         /// <summary>
-        /// Occurs when [on channel commerce].
-        /// </summary>
-        event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
-        /// <summary>
         /// Occurs when [on emote only].
         /// </summary>
         event EventHandler<OnEmoteOnlyArgs> OnEmoteOnly;
