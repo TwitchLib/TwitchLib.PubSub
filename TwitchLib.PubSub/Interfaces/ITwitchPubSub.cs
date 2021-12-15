@@ -183,11 +183,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId);
         /// <summary>
-        /// Listens to commerce events.
-        /// </summary>
-        /// <param name="channelTwitchId">The channel twitch identifier.</param>
-        void ListenToCommerce(string channelTwitchId);
-        /// <summary>
         /// Listens to follows.
         /// </summary>
         /// <param name="channelId">The channel twitch identifier.</param>
