@@ -257,7 +257,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     /// Emote ID
                     /// </summary>
                     /// <value>The identifier.</value>
-                    public int Id { get; protected set; }
+                    public string Id { get; protected set; }
                     /// <summary>
                     /// Starting character of emote
                     /// </summary>
@@ -275,7 +275,7 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     /// <param name="json">The json.</param>
                     public EmoteObj(JToken json)
                     {
-                        Id = int.Parse(json.SelectToken("id").ToString());
+                        Id = json.SelectToken("emote_id").ToString();
                         Start = int.Parse(json.SelectToken("start").ToString());
                         End = int.Parse(json.SelectToken("end").ToString());
                     }
@@ -312,11 +312,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 /// </summary>
                 /// <value>The type of the user.</value>
                 public string UserType { get; protected set; }
-                /// <summary>
-                /// List of badges that the receiver has.
-                /// </summary>
-                /// <value>The badges.</value>
-                public List<Badge> Badges { get; protected set; } = new List<Badge>();
 
                 /// <summary>
                 /// RecipientObj constructor.
@@ -329,8 +324,6 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     DisplayName = json.SelectToken("display_name")?.ToString();
                     Color = json.SelectToken("color")?.ToString();
                     UserType = json.SelectToken("user_type")?.ToString();
-                    foreach (JToken badge in json.SelectToken("badges"))
-                        Badges.Add(new Badge(badge));
                 }
             }
 
