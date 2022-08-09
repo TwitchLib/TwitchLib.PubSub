@@ -29,10 +29,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnClearArgs> OnClear;
         /// <summary>
-        /// Occurs when [on channel commerce].
-        /// </summary>
-        event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
-        /// <summary>
         /// Occurs when [on emote only].
         /// </summary>
         event EventHandler<OnEmoteOnlyArgs> OnEmoteOnly;
@@ -186,11 +182,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// <param name="myTwitchId">My twitch identifier.</param>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId);
-        /// <summary>
-        /// Listens to commerce events.
-        /// </summary>
-        /// <param name="channelTwitchId">The channel twitch identifier.</param>
-        void ListenToCommerce(string channelTwitchId);
         /// <summary>
         /// Listens to follows.
         /// </summary>

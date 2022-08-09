@@ -161,11 +161,6 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when PubSub receives notice of a commerce transaction.
-        /// </summary>
-        public event EventHandler<OnChannelCommerceReceivedArgs> OnChannelCommerceReceived;
-        /// <inheritdoc />
-        /// <summary>
         /// Fires when PubSub receives notice that the stream of the channel being listened to goes online.
         /// </summary>
         public event EventHandler<OnStreamUpArgs> OnStreamUp;
@@ -569,26 +564,6 @@ namespace TwitchLib.PubSub
                                 return;
                             }
                             break;
-                        case "channel-commerce-events-v1":
-                            if (msg.MessageData is ChannelCommerceEvents cce)
-                            {
-                                OnChannelCommerceReceived?.Invoke(this, new OnChannelCommerceReceivedArgs
-                                {
-
-                                    Username = cce.Username,
-                                    DisplayName = cce.DisplayName,
-                                    ChannelName = cce.ChannelName,
-                                    UserId = cce.UserId,
-                                    ChannelId = cce.ChannelId,
-                                    Time = cce.Time,
-                                    ItemImageURL = cce.ItemImageURL,
-                                    ItemDescription = cce.ItemDescription,
-                                    SupportsChannel = cce.SupportsChannel,
-                                    PurchaseMessage = cce.PurchaseMessage
-                                });
-                                return;
-                            }
-                            break;
                         case "channel-ext-v1":
                             var cEB = msg.MessageData as ChannelExtensionBroadcast;
                             OnChannelExtensionBroadcast?.Invoke(this, new OnChannelExtensionBroadcastArgs { Messages = cEB.Messages, ChannelId = channelId });
@@ -875,18 +850,6 @@ namespace TwitchLib.PubSub
         public void ListenToBitsEventsV2(string channelTwitchId)
         {
             var topic = $"channel-bits-events-v2.{channelTwitchId}";
-            _topicToChannelId[topic] = channelTwitchId;
-            ListenToTopic(topic);
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Sends request to listenOn channel commerce events in specific channel
-        /// </summary>
-        /// <param name="channelTwitchId">Channel Id of channel to listen to commerce events on.</param>
-        public void ListenToCommerce(string channelTwitchId)
-        {
-            var topic = $"channel-commerce-events-v1.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
