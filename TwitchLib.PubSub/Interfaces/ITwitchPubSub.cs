@@ -111,19 +111,27 @@ namespace TwitchLib.PubSub.Interfaces
         /// <summary>
         /// Occurs when [on reward created]
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         event EventHandler<OnCustomRewardCreatedArgs> OnCustomRewardCreated;
         /// <summary>
         /// Occurs when [on reward updated]
         ///</summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         event EventHandler<OnCustomRewardUpdatedArgs> OnCustomRewardUpdated;
         /// <summary>
         /// Occurs when [on reward deleted]
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         event EventHandler<OnCustomRewardDeletedArgs> OnCustomRewardDeleted;
         /// <summary>
         /// Occurs when [on reward redeemed]
         /// </summary>
+        [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
         event EventHandler<OnRewardRedeemedArgs> OnRewardRedeemed;
+        /// <summary>
+        /// Occurs when [on reward redeemed]
+        /// </summary>
+        event EventHandler<OnChannelPointsRewardRedeemedArgs> OnChannelPointsRewardRedeemed;
         /// <summary>
         /// Occurs when [on leaderboard subs].
         /// </summary>
@@ -169,6 +177,7 @@ namespace TwitchLib.PubSub.Interfaces
         /// Listens to bits events.
         /// </summary>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        [Obsolete("This topic is deprecated by Twitch. Please use ListenToBitsEventsV2()", false)]
         void ListenToBitsEvents(string channelTwitchId);
         /// <summary>
         /// Listens to extension channel broadcast messages.
@@ -206,7 +215,13 @@ namespace TwitchLib.PubSub.Interfaces
         /// Listens to rewards
         /// </summary>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        [Obsolete("This method listens to an undocumented/retired/obsolete topic. Consider using ListenToChannelPoints()", false)]
         void ListenToRewards(string channelTwitchId);
+        /// <summary>
+        /// Listens to channel points.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToChannelPoints(string channelTwitchId);
         /// <summary>
         /// Listens to leaderboards
         /// </summary>
