@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TwitchLib.PubSub.Events
 {
-    public class OnChannelPointsRewardRedeemedArgs
+    public class OnChannelPointsRewardRedeemedArgs : EventArgs
     {
         /// <summary>
         /// The ID of the channel that this event fired from.
