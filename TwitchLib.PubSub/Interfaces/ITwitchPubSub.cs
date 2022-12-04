@@ -180,6 +180,11 @@ namespace TwitchLib.PubSub.Interfaces
         [Obsolete("This topic is deprecated by Twitch. Please use ListenToBitsEventsV2()", false)]
         void ListenToBitsEvents(string channelTwitchId);
         /// <summary>
+        /// Listens to bits events.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        void ListenToBitsEventsV2(string channelTwitchId);
+        /// <summary>
         /// Listens to extension channel broadcast messages.
         /// </summary>
         /// <param name="channelId">The channel twitch identifier.</param>
