@@ -26,12 +26,13 @@ namespace TwitchLib.PubSub
     /// Implements the <see cref="ITwitchPubSub" />
     /// </summary>
     /// <seealso cref="ITwitchPubSub" />
-    public class TwitchPubSub : ITwitchPubSub
+    public class TwitchPubSub : ITwitchPubSub , IDisposable
     {
         /// <summary>
         /// The socket
         /// </summary>
         private readonly WebSocketClient _socket;
+        private bool disposed = false;
         /// <summary>
         /// The previous requests
         /// </summary>
@@ -969,7 +970,7 @@ namespace TwitchLib.PubSub
         /// </summary>
         public void Disconnect()
         {
-            _socket.Close();
+            _socket.Close();            
         }
 
         /// <inheritdoc />
@@ -980,6 +981,44 @@ namespace TwitchLib.PubSub
         public void TestMessageParser(string testJsonString)
         {
             ParseMessage(testJsonString);
+        }
+
+        /// <summary>
+        /// Implement IDisposable.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                _socket.Close();
+                _socket.Dispose();
+                _previousRequestsSemaphore.Dispose();
+                _pingTimer.Dispose();
+                _pongTimer.Dispose();
+            }
+            // Free any unmanaged objects here.
+            //
+            _topicList.Clear();            
+            disposed = true;
+        }
+
+        /// <summary>
+        /// Destructor
+        /// </summary>
+        ~TwitchPubSub()
+        {
+            Dispose(false);
         }
     }
 }
