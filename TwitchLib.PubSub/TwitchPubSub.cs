@@ -283,7 +283,7 @@ namespace TwitchLib.PubSub
         {
             _logger = logger;
 
-            var options = new ClientOptions { ClientType = ClientType.PubSub };
+            var options = new ClientOptions(clientType: ClientType.PubSub);
             _socket = new WebSocketClient(options);
 
             _socket.OnConnected += Socket_OnConnected;
