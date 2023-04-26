@@ -250,6 +250,11 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnRaidGoArgs> OnRaidGo;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives notice when a channel cancels the raid
+        /// </summary>
+        public event EventHandler<OnRaidCancelArgs> OnRaidCancel; 
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives any data from Twitch
         /// </summary>
         public event EventHandler<OnLogArgs> OnLog;
@@ -646,6 +651,9 @@ namespace TwitchLib.PubSub
                                     return;
                                 case RaidType.RaidGo:
                                     OnRaidGo?.Invoke(this, new OnRaidGoArgs { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
+                                    return;
+                                case RaidType.RaidCancel:
+                                    OnRaidCancel?.Invoke(this, new OnRaidCancelArgs() { Id = r.Id, ChannelId = r.ChannelId, TargetChannelId = r.TargetChannelId, TargetLogin = r.TargetLogin, TargetDisplayName = r.TargetDisplayName, TargetProfileImage = r.TargetProfileImage, ViewerCount = r.ViewerCount });
                                     return;
                             }
                             return;
