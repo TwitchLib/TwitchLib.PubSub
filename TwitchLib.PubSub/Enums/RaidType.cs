@@ -20,6 +20,10 @@
         /// <summary>
         /// When the raid actually starts
         /// </summary>
-        RaidGo
+        RaidGo,
+        /// <summary>
+        /// When the raid is cancelled
+        /// </summary>
+        RaidCancel
     }
 }

@@ -86,6 +86,9 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                 case "raid_go_v2":
                     Type = RaidType.RaidGo;
                     break;
+                case "raid_cancel_v2":
+                    Type = RaidType.RaidCancel;
+                    break;
 
             }
 
@@ -110,6 +113,15 @@ namespace TwitchLib.PubSub.Models.Responses.Messages
                     ViewerCount = int.Parse(json.SelectToken("raid.viewer_count").ToString());
                     break;
                 case RaidType.RaidGo:
+                    Id = Guid.Parse(json.SelectToken("raid.id").ToString());
+                    ChannelId = json.SelectToken("raid.source_id").ToString();
+                    TargetChannelId = json.SelectToken("raid.target_id").ToString();
+                    TargetLogin = json.SelectToken("raid.target_login").ToString();
+                    TargetDisplayName = json.SelectToken("raid.target_display_name").ToString();
+                    TargetProfileImage = json.SelectToken("raid.target_profile_image").ToString();
+                    ViewerCount = int.Parse(json.SelectToken("raid.viewer_count").ToString());
+                    break;
+                case RaidType.RaidCancel:
                     Id = Guid.Parse(json.SelectToken("raid.id").ToString());
                     ChannelId = json.SelectToken("raid.source_id").ToString();
                     TargetChannelId = json.SelectToken("raid.target_id").ToString();
