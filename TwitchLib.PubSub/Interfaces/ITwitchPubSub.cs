@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using TwitchLib.PubSub.Events;
 
 namespace TwitchLib.PubSub.Interfaces
@@ -169,10 +170,22 @@ namespace TwitchLib.PubSub.Interfaces
         /// Connects this instance.
         /// </summary>
         void Connect();
+        
+        /// <summary>
+        /// Connects this instance.
+        /// </summary>
+        Task ConnectAsync();
+        
         /// <summary>
         /// Disconnects this instance.
         /// </summary>
         void Disconnect();
+
+        /// <summary>
+        /// Disconnects this instance.
+        /// </summary>
+        Task DisconnectAsync();
+        
         /// <summary>
         /// Listens to bits events.
         /// </summary>
@@ -248,6 +261,14 @@ namespace TwitchLib.PubSub.Interfaces
         /// <param name="oauth">The oauth.</param>
         /// <param name="unlisten">if set to <c>true</c> [unlisten].</param>
         void SendTopics(string oauth = null, bool unlisten = false);
+
+        /// <summary>
+        /// Sends the topics.
+        /// </summary>
+        /// <param name="oauth">The oauth.</param>
+        /// <param name="unlisten">if set to <c>true</c> [unlisten].</param>
+        Task SendTopicsAsync(string oauth = null, bool unlisten = false);
+        
         /// <summary>
         /// Tests the message parser.
         /// </summary>

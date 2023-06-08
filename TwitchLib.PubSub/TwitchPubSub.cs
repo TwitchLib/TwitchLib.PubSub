@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Enums;
@@ -288,7 +289,7 @@ namespace TwitchLib.PubSub
         {
             _logger = logger;
 
-            var options = new ClientOptions { ClientType = ClientType.PubSub };
+            var options = new ClientOptions(clientType: ClientType.PubSub);
             _socket = new WebSocketClient(options);
 
             _socket.OnConnected += Socket_OnConnected;
@@ -297,7 +298,7 @@ namespace TwitchLib.PubSub
             _socket.OnDisconnected += Socket_OnDisconnected;
 
             _pongTimer.Interval = 15000; //15 seconds, we should get a pong back within 10 seconds.
-            _pongTimer.Elapsed += PongTimerTick;
+            _pongTimer.Elapsed += PongTimerTickAsync;
         }
 
         /// <summary>
@@ -345,7 +346,7 @@ namespace TwitchLib.PubSub
         {
             _logger?.LogInformation("PubSub Websocket connection established");
             _pingTimer.Interval = 180000;
-            _pingTimer.Elapsed += PingTimerTick;
+            _pingTimer.Elapsed += PingTimerTickAsync;
             _pingTimer.Start();
             OnPubSubServiceConnected?.Invoke(this, null);
         }
@@ -355,7 +356,7 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
-        private void PingTimerTick(object sender, ElapsedEventArgs e)
+        private async void PingTimerTickAsync(object sender, ElapsedEventArgs e)
         {
             //Reset pong state.
             _pongReceived = false;
@@ -364,7 +365,8 @@ namespace TwitchLib.PubSub
             var data = new JObject(
                 new JProperty("type", "PING")
             );
-            _socket.Send(data.ToString());
+            
+            await _socket.SendAsync(data.ToString());
 
             //Start pong timer.
             _pongTimer.Start();
@@ -375,7 +377,7 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="ElapsedEventArgs"/> instance containing the event data.</param>
-        private void PongTimerTick(object sender, ElapsedEventArgs e)
+        private async void PongTimerTickAsync(object sender, ElapsedEventArgs e)
         {
             //Stop the pong timer.
             _pongTimer.Stop();
@@ -388,7 +390,7 @@ namespace TwitchLib.PubSub
             else
             {
                 //Otherwise we're disconnected so close the socket.
-                _socket.Close();
+                await _socket.CloseAsync();
             }
         }
 
@@ -680,7 +682,11 @@ namespace TwitchLib.PubSub
                 case "pong":
                     _pongReceived = true;
                     return;
-                case "reconnect": _socket.Close(); break;
+                case "reconnect":
+                    // This does not fit here. This method parses message, it shouldn't do any action.
+                    // TODO: Fire event to trigger socket close
+                    _socket.CloseAsync().GetAwaiter().GetResult(); 
+                    break;
             }
             UnaccountedFor(message);
         }
@@ -721,12 +727,18 @@ namespace TwitchLib.PubSub
         }
 
         /// <inheritdoc />
+        public void SendTopics(string oauth = null, bool unlisten = false)
+        {
+            SendTopicsAsync(oauth, unlisten).GetAwaiter().GetResult();
+        }
+        
+        /// <inheritdoc />
         /// <summary>
         /// Sends the topics.
         /// </summary>
         /// <param name="oauth">The oauth.</param>
         /// <param name="unlisten">if set to <c>true</c> [unlisten].</param>
-        public void SendTopics(string oauth = null, bool unlisten = false)
+        public async Task SendTopicsAsync(string oauth = null, bool unlisten = false)
         {
             if (oauth != null && oauth.Contains("oauth:"))
             {
@@ -764,7 +776,7 @@ namespace TwitchLib.PubSub
                 ((JObject)jsonData.SelectToken("data"))?.Add(new JProperty("auth_token", oauth));
             }
 
-            _socket.Send(jsonData.ToString());
+            await _socket.SendAsync(jsonData.ToString());
 
             _topicList.Clear();
         }
@@ -968,16 +980,25 @@ namespace TwitchLib.PubSub
         /// </summary>
         public void Connect()
         {
-            _socket.Open();
+            ConnectAsync().GetAwaiter().GetResult();
+        }
+        
+        /// <inheritdoc />
+        public async Task ConnectAsync()
+        {
+            await _socket.OpenAsync();
         }
 
         /// <inheritdoc />
-        /// <summary>
-        /// What do you think it does? :)
-        /// </summary>
         public void Disconnect()
         {
-            _socket.Close();
+            DisconnectAsync().GetAwaiter().GetResult();
+        }
+        
+        /// <inheritdoc />
+        public async Task DisconnectAsync()
+        {
+            await _socket.CloseAsync();
         }
 
         /// <inheritdoc />
