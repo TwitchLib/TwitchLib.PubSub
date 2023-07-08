@@ -194,6 +194,16 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelSubscriptionArgs> OnChannelSubscription;
         /// <inheritdoc />
         /// <summary>
+        /// Fires when PubSub receives notice when the channel unlocks bit badge.
+        /// </summary>
+        public event EventHandler<OnChannelBitsBadgeUnlockArgs> OnChannelBitsBadgeUnlock;
+        /// <inheritdoc />
+        /// <summary>
+        /// Fires when PubSub receives notice when the channel detects low trust user.
+        /// </summary>
+        public event EventHandler<OnLowTrustUsersArgs> OnLowTrustUsers;
+        /// <inheritdoc />
+        /// <summary>
         /// Fires when PubSub receives a message sent to the specified extension on the specified channel.
         /// </summary>
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
@@ -480,6 +490,14 @@ namespace TwitchLib.PubSub
                             var subscription = msg.MessageData as ChannelSubscription;
                             OnChannelSubscription?.Invoke(this, new OnChannelSubscriptionArgs { Subscription = subscription, ChannelId = channelId });
                             return;
+                        case "channel-bits-badge-unlocks":
+                            var channelBitsBadgeUnlocks = msg.MessageData as BitsBadgeNotificationMessage;
+                            OnChannelBitsBadgeUnlock?.Invoke(this, new OnChannelBitsBadgeUnlockArgs { BitsBadgeUnlocks = channelBitsBadgeUnlocks, ChannelId = channelId });
+                            break;
+                        case "low-trust-users":
+                            var lowTrustUsers = msg.MessageData as LowTrustUsers;
+                            OnLowTrustUsers?.Invoke(this, new OnLowTrustUsersArgs { LowTrustUsers = lowTrustUsers, ChannelId = channelId });
+                            break;
                         case "whispers":
                             var whisper = (Whisper)msg.MessageData;
                             OnWhisper?.Invoke(this, new OnWhisperArgs { Whisper = whisper, ChannelId = channelId });
@@ -541,24 +559,6 @@ namespace TwitchLib.PubSub
                                 case "r9kbetaoff":
                                     OnR9kBetaOff?.Invoke(this, new OnR9kBetaOffArgs { Moderator = cma.CreatedBy, ChannelId = channelId });
                                     return;
-                            }
-                            break;
-                        case "channel-bits-events-v1":
-                            if (msg.MessageData is ChannelBitsEvents cbe)
-                            {
-                                OnBitsReceived?.Invoke(this, new OnBitsReceivedArgs
-                                {
-                                    BitsUsed = cbe.BitsUsed,
-                                    ChannelId = cbe.ChannelId,
-                                    ChannelName = cbe.ChannelName,
-                                    ChatMessage = cbe.ChatMessage,
-                                    Context = cbe.Context,
-                                    Time = cbe.Time,
-                                    TotalBitsUsed = cbe.TotalBitsUsed,
-                                    UserId = cbe.UserId,
-                                    Username = cbe.Username
-                                });
-                                return;
                             }
                             break;
                         case "channel-bits-events-v2":

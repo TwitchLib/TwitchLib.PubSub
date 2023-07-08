@@ -32,6 +32,10 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;
         /// <summary>
+        /// Fires when PubSub receives notice when the channel unlocks bit badge.
+        /// </summary>
+        event EventHandler<OnChannelBitsBadgeUnlockArgs> OnChannelBitsBadgeUnlock;
+        /// <summary>
         /// Occurs when [on channel extension broadcast].
         /// </summary>
         event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
@@ -67,6 +71,10 @@ namespace TwitchLib.PubSub.Interfaces
         /// Occurs when [on listen response].
         /// </summary>
         event EventHandler<OnListenResponseArgs> OnListenResponse;
+        /// <summary>
+        /// Fires when PubSub receives notice when the channel detects low trust user.
+        /// </summary>
+        event EventHandler<OnLowTrustUsersArgs> OnLowTrustUsers;
         /// <summary>
         /// Occurs when [on pub sub service closed].
         /// </summary>
