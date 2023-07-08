@@ -24,10 +24,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnBanArgs> OnBan;
         /// <summary>
-        /// Occurs when [on bits received].
-        /// </summary>
-        event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
-        /// <summary>
         /// Fires when PubSub receives a bits message.
         /// </summary>
         event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;

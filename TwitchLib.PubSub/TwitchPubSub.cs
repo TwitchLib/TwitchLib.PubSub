@@ -159,11 +159,6 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnR9kBetaOffArgs> OnR9kBetaOff;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when PubSub receives notice of a bit donation.
-        /// </summary>
-        public event EventHandler<OnBitsReceivedArgs> OnBitsReceived;
-        /// <inheritdoc />
-        /// <summary>
         /// Fires when PubSub receives a bits message.
         /// </summary>
         public event EventHandler<OnBitsReceivedV2Args> OnBitsReceivedV2;
