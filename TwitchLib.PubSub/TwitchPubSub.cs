@@ -29,6 +29,13 @@ namespace TwitchLib.PubSub
     /// <seealso cref="ITwitchPubSub" />
     public class TwitchPubSub : ITwitchPubSub
     {
+        private const string PingPayload = "{ \"type\": \"PING\" }";
+
+        /// <summary>
+        /// The random
+        /// </summary>
+        private static readonly Random Random = new Random();
+        
         /// <summary>
         /// The socket
         /// </summary>
@@ -292,10 +299,10 @@ namespace TwitchLib.PubSub
             var options = new ClientOptions(clientType: ClientType.PubSub);
             _socket = new WebSocketClient(options);
 
-            _socket.OnConnected += Socket_OnConnected;
-            _socket.OnError += OnError;
-            _socket.OnMessage += OnMessage;
-            _socket.OnDisconnected += Socket_OnDisconnected;
+            _socket.OnConnected += Socket_OnConnectedAsync;
+            _socket.OnError += OnErrorAsync;
+            _socket.OnMessage += OnMessageAsync;
+            _socket.OnDisconnected += Socket_OnDisconnectedAsync;
 
             _pongTimer.Interval = 15000; //15 seconds, we should get a pong back within 10 seconds.
             _pongTimer.Elapsed += PongTimerTickAsync;
@@ -306,10 +313,12 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="OnErrorEventArgs"/> instance containing the event data.</param>
-        private void OnError(object sender, OnErrorEventArgs e)
+        private Task OnErrorAsync(object sender, OnErrorEventArgs e)
         {
             _logger?.LogError($"OnError in PubSub Websocket connection occured! Exception: {e.Exception}");
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -317,11 +326,11 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="OnMessageEventArgs"/> instance containing the event data.</param>
-        private void OnMessage(object sender, OnMessageEventArgs e)
+        private Task OnMessageAsync(object sender, OnMessageEventArgs e)
         {
             _logger?.LogDebug($"Received Websocket OnMessage: {e.Message}");
             OnLog?.Invoke(this, new OnLogArgs { Data = e.Message });
-            ParseMessage(e.Message);
+            return ParseMessageAsync(e.Message);
         }
 
         /// <summary>
@@ -329,12 +338,14 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Socket_OnDisconnected(object sender, EventArgs e)
+        private Task Socket_OnDisconnectedAsync(object sender, EventArgs e)
         {
             _logger?.LogWarning("PubSub Websocket connection closed");
             _pingTimer.Stop();
             _pongTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -342,15 +353,17 @@ namespace TwitchLib.PubSub
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
-        private void Socket_OnConnected(object sender, EventArgs e)
+        private Task Socket_OnConnectedAsync(object sender, EventArgs e)
         {
             _logger?.LogInformation("PubSub Websocket connection established");
             _pingTimer.Interval = 180000;
             _pingTimer.Elapsed += PingTimerTickAsync;
             _pingTimer.Start();
             OnPubSubServiceConnected?.Invoke(this, null);
-        }
 
+            return Task.CompletedTask;
+        }
+        
         /// <summary>
         /// Pings the timer tick.
         /// </summary>
@@ -362,11 +375,7 @@ namespace TwitchLib.PubSub
             _pongReceived = false;
 
             //Send ping.
-            var data = new JObject(
-                new JProperty("type", "PING")
-            );
-            
-            await _socket.SendAsync(data.ToString());
+            await _socket.SendAsync(PingPayload);
 
             //Start pong timer.
             _pongTimer.Start();
@@ -398,7 +407,7 @@ namespace TwitchLib.PubSub
         /// Parses the message.
         /// </summary>
         /// <param name="message">The message.</param>
-        private void ParseMessage(string message)
+        private async Task ParseMessageAsync(string message)
         {
             var type = JObject.Parse(message).SelectToken("type")?.ToString();
 
@@ -683,18 +692,13 @@ namespace TwitchLib.PubSub
                     _pongReceived = true;
                     return;
                 case "reconnect":
-                    // This does not fit here. This method parses message, it shouldn't do any action.
-                    // TODO: Fire event to trigger socket close
-                    _socket.CloseAsync().GetAwaiter().GetResult(); 
+                    await _socket.CloseAsync(); 
                     break;
             }
+            
             UnaccountedFor(message);
         }
-
-        /// <summary>
-        /// The random
-        /// </summary>
-        private static readonly Random Random = new Random();
+        
         /// <summary>
         /// Generates the nonce.
         /// </summary>
@@ -798,6 +802,7 @@ namespace TwitchLib.PubSub
         /// <param name="channelId">The channel identifier.</param>
         public void ListenToFollows(string channelId)
         {
+            // This topic is not documented
             var topic = $"following.{channelId}";
             _topicToChannelId[topic] = channelId;
             ListenToTopic(topic);
@@ -816,6 +821,12 @@ namespace TwitchLib.PubSub
             ListenToTopic(topic);
         }
 
+        /// <inheritdoc />
+        /// <summary>
+        /// A user’s message held by AutoMod has been approved or denied.
+        /// </summary>
+        /// <param name="myTwitchId">Current user identifier.</param>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
         public void ListenToUserModerationNotifications(string myTwitchId, string channelTwitchId)
         {
             var topic = $"user-moderation-notifications.{myTwitchId}.{channelTwitchId}";
@@ -844,21 +855,9 @@ namespace TwitchLib.PubSub
         /// <param name="extensionId">The extension identifier.</param>
         public void ListenToChannelExtensionBroadcast(string channelId, string extensionId)
         {
+            // This topic is not documented
             var topic = $"channel-ext-v1.{channelId}-{extensionId}-broadcast";
             _topicToChannelId[topic] = channelId;
-            ListenToTopic(topic);
-        }
-
-        /// <inheritdoc />
-        /// <summary>
-        /// Sends request to listenOn bits events in specific channel
-        /// </summary>
-        /// <param name="channelTwitchId">Channel Id of channel to listen to bits on (can be fetched from TwitchApi)</param>
-        [Obsolete("This topic is deprecated by Twitch. Please use ListenToBitsEventsV2()", false)]
-        public void ListenToBitsEvents(string channelTwitchId)
-        {
-            var topic = $"channel-bits-events-v1.{channelTwitchId}";
-            _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
 
@@ -881,6 +880,7 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Id of channel to listen to playback events in.</param>
         public void ListenToVideoPlayback(string channelTwitchId)
         {
+            // This topic is not documented
             var topic = $"video-playback-by-id.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
@@ -930,6 +930,7 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel to listen to leaderboards on.</param>
         public void ListenToLeaderboards(string channelTwitchId)
         {
+            // These topics are not documented
             var topicBits = $"leaderboard-events-v1.bits-usage-by-channel-v1-{channelTwitchId}-WEEK";
             var topicSubs = $"leaderboard-events-v1.sub-gift-sent-{channelTwitchId}-WEEK";
             _topicToChannelId[topicBits] = channelTwitchId;
@@ -944,6 +945,7 @@ namespace TwitchLib.PubSub
         /// <param name="channelTwitchId">Channel to listen to raids get prepared on.</param>
         public void ListenToRaid(string channelTwitchId)
         {
+            // This topic is not documented
             var topicRaid = $"raid.{channelTwitchId}";
             _topicToChannelId[topicRaid] = channelTwitchId;
             ListenToTopic(topicRaid);
@@ -965,10 +967,36 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Sends request to listen to channel predictions.
         /// </summary>
-        /// <param name="channelTwitchId"></param>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
         public void ListenToPredictions(string channelTwitchId)
         {
+            // This topic is not documented
             var topic = $"predictions-channel-v1.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+        
+        /// <inheritdoc />
+        /// <summary>
+        /// Message sent when a user earns a new Bits badge in a particular channel, and chooses to share the notification with chat.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        public void ListenToChannelBitsBadgeUnlocks(string channelTwitchId)
+        {
+            var topic = $"channel-bits-badge-unlocks.{channelTwitchId}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+        
+        /// <inheritdoc />
+        /// <summary>
+        /// The broadcaster or a moderator updates the low trust status of a user, or a new message has been sent in chat by a potential ban evader or a bans shared user.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier.</param>
+        /// <param name="suspiciousUser">Suspicious user identifier.</param>
+        public void ListenToLowTrustUsers(string channelTwitchId, string suspiciousUser)
+        {
+            var topic = $"low-trust-users.{channelTwitchId}.{suspiciousUser}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
@@ -1008,7 +1036,7 @@ namespace TwitchLib.PubSub
         /// <param name="testJsonString">The test json string.</param>
         public void TestMessageParser(string testJsonString)
         {
-            ParseMessage(testJsonString);
+            ParseMessageAsync(testJsonString).GetAwaiter().GetResult();
         }
     }
 }
