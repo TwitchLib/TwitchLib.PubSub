@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
-using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
 using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 
 namespace TwitchLib.PubSub.Models.Responses
@@ -41,9 +40,6 @@ namespace TwitchLib.PubSub.Models.Responses
                 case "chat_moderator_actions":
                     MessageData = new ChatModeratorActions(encodedJsonMessage);
                     break;
-                case "channel-bits-events-v1":
-                    MessageData = new ChannelBitsEvents(encodedJsonMessage);
-                    break;
                 case "channel-bits-events-v2":
                     encodedJsonMessage = encodedJsonMessage.Replace("\\", "");
                     var dataEncoded = JObject.Parse(encodedJsonMessage)["data"].ToString();
@@ -78,6 +74,14 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;                
                 case "predictions-channel-v1":
                     MessageData = new PredictionEvents(encodedJsonMessage);
+                    break;
+                case "channel-bits-badge-unlocks":
+                    encodedJsonMessage = encodedJsonMessage.Replace("\\", "");
+                    var channelBitsBadgeData = JObject.Parse(encodedJsonMessage)["data"].ToString();
+                    MessageData = JsonConvert.DeserializeObject<BitsBadgeNotificationMessage>(channelBitsBadgeData);
+                    break;
+                case "low-trust-users":
+                    MessageData = new LowTrustUsers(encodedJsonMessage);
                     break;
             }
         }
