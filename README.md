@@ -8,7 +8,8 @@
 TwitchLib repository representing all code belonging to the implementation Twitch's PubSub service.
 
 ## Note
-Trying to listen to events that an account does not have (bits / subs for example) and require Oauth, will return Bad Oauth. Code accordingly.
+Trying to listen to events that an account does not have (bits / subs for example) and require Oauth, will return Bad Oauth. Code accordingly.  
+**Developers:** Please note the Master branch is not updated. All changes are being pushed to the **Dev** branch
 
 ### Example
 ```csharp
