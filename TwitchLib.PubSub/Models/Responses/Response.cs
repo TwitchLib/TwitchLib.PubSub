@@ -29,10 +29,18 @@ namespace TwitchLib.PubSub.Models.Responses
         /// Response model constructor.
         /// </summary>
         /// <param name="json">The json.</param>
-        public Response(string json)
+        public Response(string json) : this(JObject.Parse(json))
         {
-            Error = JObject.Parse(json).SelectToken("error")?.ToString();
-            Nonce = JObject.Parse(json).SelectToken("nonce")?.ToString();
+        }
+
+        /// <summary>
+        /// Response model constructor.
+        /// </summary>
+        /// <param name="json">The json.</param>
+        internal Response(JObject json)
+        {
+            Error = json.SelectToken("error")?.ToString();
+            Nonce = json.SelectToken("nonce")?.ToString();
             if (string.IsNullOrWhiteSpace(Error))
                 Successful = true;
         }

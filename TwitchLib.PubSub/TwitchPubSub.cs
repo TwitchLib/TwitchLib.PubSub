@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
@@ -12,6 +12,7 @@ using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 using TwitchLib.PubSub.Enums;
 using TwitchLib.PubSub.Events;
+using TwitchLib.PubSub.Extensions;
 using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
@@ -35,7 +36,7 @@ namespace TwitchLib.PubSub
         /// The random
         /// </summary>
         private static readonly Random Random = new Random();
-        
+
         /// <summary>
         /// The socket
         /// </summary>
@@ -265,7 +266,7 @@ namespace TwitchLib.PubSub
         /// <summary>
         /// Fires when PubSub receives notice when a channel cancels the raid
         /// </summary>
-        public event EventHandler<OnRaidCancelArgs> OnRaidCancel; 
+        public event EventHandler<OnRaidCancelArgs> OnRaidCancel;
         /// <inheritdoc />
         /// <summary>
         /// Fires when PubSub receives any data from Twitch
@@ -320,7 +321,7 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="OnErrorEventArgs"/> instance containing the event data.</param>
         private Task OnErrorAsync(object sender, OnErrorEventArgs e)
         {
-            _logger?.LogError($"OnError in PubSub Websocket connection occured! Exception: {e.Exception}");
+            _logger?.LogOnError(e.Exception);
             OnPubSubServiceError?.Invoke(this, new OnPubSubServiceErrorArgs { Exception = e.Exception });
 
             return Task.CompletedTask;
@@ -333,7 +334,7 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="OnMessageEventArgs"/> instance containing the event data.</param>
         private Task OnMessageAsync(object sender, OnMessageEventArgs e)
         {
-            _logger?.LogDebug($"Received Websocket OnMessage: {e.Message}");
+            _logger?.LogReceivednMessage(e.Message);
             OnLog?.Invoke(this, new OnLogArgs { Data = e.Message });
             return ParseMessageAsync(e.Message);
         }
@@ -345,7 +346,7 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private Task Socket_OnDisconnectedAsync(object sender, EventArgs e)
         {
-            _logger?.LogWarning("PubSub Websocket connection closed");
+            _logger?.LogConnectionClosed();
             _pingTimer.Stop();
             _pongTimer.Stop();
             OnPubSubServiceClosed?.Invoke(this, null);
@@ -360,7 +361,7 @@ namespace TwitchLib.PubSub
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private Task Socket_OnConnectedAsync(object sender, EventArgs e)
         {
-            _logger?.LogInformation("PubSub Websocket connection established");
+            _logger?.LogConnectionEstablished();
             _pingTimer.Interval = 180000;
             _pingTimer.Elapsed += PingTimerTickAsync;
             _pingTimer.Start();
@@ -368,7 +369,7 @@ namespace TwitchLib.PubSub
 
             return Task.CompletedTask;
         }
-        
+
         /// <summary>
         /// Pings the timer tick.
         /// </summary>
@@ -414,12 +415,13 @@ namespace TwitchLib.PubSub
         /// <param name="message">The message.</param>
         private async Task ParseMessageAsync(string message)
         {
-            var type = JObject.Parse(message).SelectToken("type")?.ToString();
+            var parsedJson = JObject.Parse(message);
+            var type = parsedJson.SelectToken("type")?.ToString();
 
             switch (type?.ToLower())
             {
                 case "response":
-                    var resp = new Models.Responses.Response(message);
+                    var resp = new Models.Responses.Response(parsedJson);
                     if (_previousRequests.Count != 0)
                     {
                         bool handled = false;
@@ -451,7 +453,7 @@ namespace TwitchLib.PubSub
                     }
                     break;
                 case "message":
-                    var msg = new Models.Responses.Message(message);
+                    var msg = new Models.Responses.Message(parsedJson);
                     _topicToChannelId.TryGetValue(msg.Topic, out var channelId);
                     channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
@@ -687,21 +689,27 @@ namespace TwitchLib.PubSub
                     _pongReceived = true;
                     return;
                 case "reconnect":
-                    await _socket.CloseAsync(); 
+                    await _socket.CloseAsync();
                     break;
             }
-            
+
             UnaccountedFor(message);
         }
-        
+
         /// <summary>
         /// Generates the nonce.
         /// </summary>
         /// <returns>System.String.</returns>
         private static string GenerateNonce()
         {
-            return new string(Enumerable.Repeat("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 8)
-                .Select(s => s[Random.Next(s.Length)]).ToArray());
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Span<char> nonce = stackalloc char[8];
+            foreach (ref var c in nonce)
+            {
+                var index = Random.Next(chars.Length);
+                c = chars[index];
+            }
+            return nonce.ToString();
         }
 
         /// <summary>
@@ -730,7 +738,7 @@ namespace TwitchLib.PubSub
         {
             SendTopicsAsync(oauth, unlisten).GetAwaiter().GetResult();
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// Sends the topics.
@@ -746,14 +754,14 @@ namespace TwitchLib.PubSub
 
             var nonce = GenerateNonce();
 
-            var topics = new JArray();
+            var topics = new List<string>(_topicList.Count);
             _previousRequestsSemaphore.WaitOne();
             try
             {
                 foreach (var val in _topicList)
                 {
                     _previousRequests.Add(new PreviousRequest(nonce, PubSubRequestType.ListenToTopic, val));
-                    topics.Add(new JValue(val));
+                    topics.Add(val);
                 }
             }
             finally
@@ -761,21 +769,19 @@ namespace TwitchLib.PubSub
                 _previousRequestsSemaphore.Release();
             }
 
-            var jsonData = new JObject(
-                new JProperty("type", !unlisten ? "LISTEN" : "UNLISTEN"),
-                new JProperty("nonce", nonce),
-                new JProperty("data",
-                    new JObject(
-                        new JProperty("topics", topics)
-                        )
-                    )
-                );
-            if (oauth != null)
+            var request = new Request()
             {
-                ((JObject)jsonData.SelectToken("data"))?.Add(new JProperty("auth_token", oauth));
-            }
+                Type = unlisten ? "UNLISTEN" : "LISTEN",
+                Nonce = nonce,
+                Data = new()
+                {
+                    Topics = topics,
+                    AuthToken = oauth,
+                }
+            };
 
-            await _socket.SendAsync(jsonData.ToString());
+            var json = JsonConvert.SerializeObject(request);
+            await _socket.SendAsync(json);
 
             _topicList.Clear();
         }
@@ -786,7 +792,7 @@ namespace TwitchLib.PubSub
         /// <param name="message">The message.</param>
         private void UnaccountedFor(string message)
         {
-            _logger?.LogInformation($"[TwitchPubSub] {message}");
+            _logger?.LogUnaccountedFor(message);
         }
 
         #region Listeners
@@ -970,7 +976,7 @@ namespace TwitchLib.PubSub
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// Message sent when a user earns a new Bits badge in a particular channel, and chooses to share the notification with chat.
@@ -982,7 +988,7 @@ namespace TwitchLib.PubSub
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// The broadcaster or a moderator updates the low trust status of a user, or a new message has been sent in chat by a potential ban evader or a bans shared user.
@@ -1005,7 +1011,7 @@ namespace TwitchLib.PubSub
         {
             ConnectAsync().GetAwaiter().GetResult();
         }
-        
+
         /// <inheritdoc />
         public async Task ConnectAsync()
         {
@@ -1017,7 +1023,7 @@ namespace TwitchLib.PubSub
         {
             DisconnectAsync().GetAwaiter().GetResult();
         }
-        
+
         /// <inheritdoc />
         public async Task DisconnectAsync()
         {

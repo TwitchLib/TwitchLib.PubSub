@@ -24,9 +24,17 @@ namespace TwitchLib.PubSub.Models.Responses
         /// PubSub Message model constructor.
         /// </summary>
         /// <param name="jsonStr">The json string.</param>
-        public Message(string jsonStr)
+        public Message(string jsonStr) : this(JObject.Parse(jsonStr))
         {
-            var json = JObject.Parse(jsonStr).SelectToken("data");
+        }
+
+        /// <summary>
+        /// PubSub Message model constructor.
+        /// </summary>
+        /// <param name="jsonObject">The json.</param>
+        internal Message(JObject jsonObject)
+        {
+            var json = jsonObject.SelectToken("data");
             Topic = json.SelectToken("topic")?.ToString();
             var encodedJsonMessage = json.SelectToken("message").ToString();
             switch (Topic?.Split('.')[0])
@@ -71,7 +79,7 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "raid":
                     MessageData = new RaidEvents(encodedJsonMessage);
-                    break;                
+                    break;
                 case "predictions-channel-v1":
                     MessageData = new PredictionEvents(encodedJsonMessage);
                     break;
