@@ -29,7 +29,7 @@ namespace TwitchLib.PubSub
     /// Implements the <see cref="ITwitchPubSub" />
     /// </summary>
     /// <seealso cref="ITwitchPubSub" />
-    public class TwitchPubSub : ITwitchPubSub
+    public class TwitchPubSub : ITwitchPubSub, IDisposable
     {
         private const string PingPayload = "{ \"type\": \"PING\" }";
 
@@ -73,6 +73,8 @@ namespace TwitchLib.PubSub
 
         private readonly Dictionary<string, string> _topicToChannelId = new Dictionary<string, string>();
 
+        private bool _disposed = false;
+        
         #region Events
         /// <inheritdoc />
         /// <summary>
@@ -1074,6 +1076,39 @@ namespace TwitchLib.PubSub
         public void TestMessageParser(string testJsonString)
         {
             ParseMessageAsync(testJsonString).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Implement IDisposable.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual async void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
+
+            if (disposing)
+            {
+                await _socket.CloseAsync();
+                _socket.Dispose();
+                _previousRequestsSemaphore.Dispose();
+                _pingTimer.Dispose();
+                _pongTimer.Dispose();
+            }
+            
+            _previousRequests.Clear();
+            _topicList.Clear();
+            _disposed = true;
+        }
+
+        ~TwitchPubSub()
+        {
+            Dispose(false);
         }
     }
 }
