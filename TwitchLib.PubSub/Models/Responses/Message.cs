@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TwitchLib.PubSub.Models.Responses.Messages;
+using TwitchLib.PubSub.Models.Responses.Messages.HypeTrain;
 using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 
 namespace TwitchLib.PubSub.Models.Responses
@@ -90,6 +91,9 @@ namespace TwitchLib.PubSub.Models.Responses
                     break;
                 case "low-trust-users":
                     MessageData = new LowTrustUsers(encodedJsonMessage);
+                    break;
+                case "hype-train-events-v1":
+                    MessageData = new HypeTrainEvent(encodedJsonMessage);
                     break;
             }
         }

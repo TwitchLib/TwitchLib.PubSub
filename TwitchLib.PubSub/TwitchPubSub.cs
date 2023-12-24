@@ -17,6 +17,7 @@ using TwitchLib.PubSub.Interfaces;
 using TwitchLib.PubSub.Models;
 using TwitchLib.PubSub.Models.Responses.Messages;
 using TwitchLib.PubSub.Models.Responses.Messages.AutomodCaughtMessage;
+using TwitchLib.PubSub.Models.Responses.Messages.HypeTrain;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 using TwitchLib.PubSub.Models.Responses.Messages.UserModerationNotifications;
 using Timer = System.Timers.Timer;
@@ -292,6 +293,16 @@ namespace TwitchLib.PubSub
         /// Fires when a moderation event hits a user
         /// </summary>
         public event EventHandler<OnAutomodCaughtUserMessage> OnAutomodCaughtUserMessage;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when hype train event is received
+        /// </summary>
+        public event EventHandler<OnHypeTrainProgressionArgs> OnHypeTrainProgression;
+        /// <inheritdoc/>
+        /// <summary>
+        /// Fires when an existing hype train levels up
+        /// </summary>
+        public event EventHandler<OnHypeTrainLevelUp> OnHypeTrainLevelUp;
         #endregion
 
         /// <summary>
@@ -458,6 +469,20 @@ namespace TwitchLib.PubSub
                     channelId = channelId ?? "";
                     switch (msg.Topic.Split('.')[0])
                     {
+                        case "hype-train-events-v1":
+                            var hypeTrainEvent = msg.MessageData as HypeTrainEvent;
+                            switch(hypeTrainEvent.Type)
+                            {
+                                case HypeTrainEventType.Progression:
+                                    var progression = hypeTrainEvent.Data as HypeTrainProgression;
+                                    OnHypeTrainProgression?.Invoke(this, new OnHypeTrainProgressionArgs { ChannelId = channelId, Progression = progression });
+                                    break;
+                                case HypeTrainEventType.LevelUp:
+                                    var levelUp = hypeTrainEvent.Data as HypeTrainLevelUp;
+                                    OnHypeTrainLevelUp?.Invoke(this, new OnHypeTrainLevelUp { ChannelId = channelId, LevelUp = levelUp });
+                                    break;
+                            }
+                            return;
                         case "user-moderation-notifications":
                             var userModerationNotifications = msg.MessageData as UserModerationNotifications;
                             switch(userModerationNotifications.Type)
@@ -998,6 +1023,17 @@ namespace TwitchLib.PubSub
         public void ListenToLowTrustUsers(string channelTwitchId, string suspiciousUser)
         {
             var topic = $"low-trust-users.{channelTwitchId}.{suspiciousUser}";
+            _topicToChannelId[topic] = channelTwitchId;
+            ListenToTopic(topic);
+        }
+
+        /// <summary>
+        /// A hype train makes progress or levels up.
+        /// </summary>
+        /// <param name="channelTwitchId">The channel twitch identifier</param>
+        public void ListenToHypeTrains(string channelTwitchId)
+        {
+            var topic = $"hype-train-events-v1.{channelTwitchId}";
             _topicToChannelId[topic] = channelTwitchId;
             ListenToTopic(topic);
         }
