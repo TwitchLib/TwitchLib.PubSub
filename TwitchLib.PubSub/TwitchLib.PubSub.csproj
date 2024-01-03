@@ -26,6 +26,6 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
-    <PackageReference Include="TwitchLib.Communication" Version="2.0.0" />
+    <PackageReference Include="TwitchLib.Communication" Version="2.0.1" />
   </ItemGroup>
 </Project>
