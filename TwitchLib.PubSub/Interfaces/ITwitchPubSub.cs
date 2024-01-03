@@ -52,10 +52,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// </summary>
         event EventHandler<OnEmoteOnlyOffArgs> OnEmoteOnlyOff;
         /// <summary>
-        /// Occurs when [on follow].
-        /// </summary>
-        event EventHandler<OnFollowArgs> OnFollow;
-        /// <summary>
         /// Occurs when [on host].
         /// </summary>
         event EventHandler<OnHostArgs> OnHost;
@@ -225,11 +221,6 @@ namespace TwitchLib.PubSub.Interfaces
         /// <param name="myTwitchId">My twitch identifier.</param>
         /// <param name="channelTwitchId">The channel twitch identifier.</param>
         void ListenToChatModeratorActions(string myTwitchId, string channelTwitchId);
-        /// <summary>
-        /// Listens to follows.
-        /// </summary>
-        /// <param name="channelId">The channel twitch identifier.</param>
-        void ListenToFollows(string channelId);
         /// <summary>
         /// Listens to subscriptions.
         /// </summary>
