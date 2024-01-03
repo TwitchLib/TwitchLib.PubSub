@@ -208,11 +208,6 @@ namespace TwitchLib.PubSub
         public event EventHandler<OnChannelExtensionBroadcastArgs> OnChannelExtensionBroadcast;
         /// <inheritdoc />
         /// <summary>
-        /// Fires when PubSub receives notice when a user follows the designated channel.
-        /// </summary>
-        public event EventHandler<OnFollowArgs> OnFollow;
-        /// <inheritdoc />
-        /// <summary>
         /// Fires when PubSub receives notice when a custom reward has been created on the specified channel.
         ///</summary>
         [Obsolete("This event fires on an undocumented/retired/obsolete topic.", false)]
@@ -626,11 +621,6 @@ namespace TwitchLib.PubSub
                                     return;
                             }
                             break;
-                        case "following":
-                            var f = (Following)msg.MessageData;
-                            f.FollowedChannelId = msg.Topic.Split('.')[1];
-                            OnFollow?.Invoke(this, new OnFollowArgs { FollowedChannelId = f.FollowedChannelId, DisplayName = f.DisplayName, UserId = f.UserId, Username = f.Username });
-                            return;
                         case "community-points-channel-v1":
                             var cpc = msg.MessageData as CommunityPointsChannel;
                             switch (cpc?.Type)
@@ -823,19 +813,6 @@ namespace TwitchLib.PubSub
         }
 
         #region Listeners
-        /// <inheritdoc />
-        /// <summary>
-        /// Sends a request to listenOn follows coming into a specified channel.
-        /// </summary>
-        /// <param name="channelId">The channel identifier.</param>
-        public void ListenToFollows(string channelId)
-        {
-            // This topic is not documented
-            var topic = $"following.{channelId}";
-            _topicToChannelId[topic] = channelId;
-            ListenToTopic(topic);
-        }
-
         /// <inheritdoc />
         /// <summary>
         /// Sends a request to listenOn timeouts and bans in a specific channel
