@@ -1,3 +1,7 @@
+# PubSub Decommissioned by Twitch
+
+See https://discuss.dev.twitch.com/t/legacy-pubsub-deprecation-and-shutdown-timeline/58043
+
 <p align="center"> 
 <img src="https://cdn.syzuna-programs.de/images/twitchlib.png" style="max-height: 300px;">
 </p>
